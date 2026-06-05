@@ -1,5 +1,8 @@
 from django.db import models
 
+<<<<<<< HEAD
+# Create your models here.
+=======
 
 class Produto(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome")
@@ -21,3 +24,4 @@ class Produto(models.Model):
 
     def __str__(self):
         return self.nome
+>>>>>>> 1a269466f8b708dc39cfe6b8d9d866ae8627679e

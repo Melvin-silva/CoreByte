@@ -1,4 +1,8 @@
 from django.shortcuts import render
+<<<<<<< HEAD
+
+# Create your views here.
+=======
 from django.http import HttpResponse
 
 def index(request):
@@ -16,3 +20,4 @@ def test_500(request):
 def forcar_erro(request):
     
     return HttpResponse(1 / 0)
+>>>>>>> 1a269466f8b708dc39cfe6b8d9d866ae8627679e

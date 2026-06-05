@@ -1,0 +1,318 @@
+/* ==========================================
+   1. LAYOUT GERAL E HEADER
+   ========================================== */
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 5%;
+    gap: 30px;
+    width: 100%;
+}
+
+.search-bar {
+    display: flex;
+    position: relative;
+    flex: 3;
+    max-width: 900px;
+    min-width: 400px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 12px 45px 12px 15px;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    font-size: 16px;
+}
+
+.search-bar button {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.logo img {
+    height: 120px;
+    width: auto;
+    display: block;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+}
+
+/* ==========================================
+   2. CARRINHO (Sidebar e Overlay)
+   ========================================== */
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 380px;
+    height: 100vh;
+    background: #121212;
+    color: #fff;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+    border-left: 2px solid #8a2be2;
+}
+
+.cart-sidebar.open { right: 0; }
+
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    z-index: 1500;
+}
+
+.cart-overlay.active { display: block; }
+
+.cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+.cart-header h3 { font-size: 1.5rem; text-transform: uppercase; color: #ffffff; }
+
+#close-cart { background: none; border: 1px solid #444; color: #fff; cursor: pointer; width: 35px; height: 35px; border-radius: 5px; }
+#close-cart:hover { background: #ff4b2b; }
+
+.cart-items { flex-grow: 1; overflow-y: auto; margin-bottom: 20px; scrollbar-width: thin; scrollbar-color: #8a2be2 #121212; }
+
+.cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #333; }
+
+.cart-footer { border-top: 1px solid #333; padding-top: 20px; }
+.cart-total { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 20px; }
+
+/* ==========================================
+   3. PRODUTOS E BOTÕES
+   ========================================== */
+/* Remove qualquer transição e efeito de opacidade */
+.product-card {
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+}
+
+/* Oculta instantaneamente */
+.product-card.esconder-animado {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+.add-to-cart-btn {
+    background-color: #6a0dad;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(106, 13, 173, 0.7);
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: 100%;
+    transition: 0.3s;
+}
+
+.add-to-cart-btn:hover { background-color: #8a2be2; box-shadow: 0 0 25px rgba(138, 43, 226, 0.9); transform: scale(1.02); }
+
+/* ==========================================
+   4. FILTROS E SIDEBAR ESQUERDA
+   ========================================== */
+.filter-box {
+    background-color: #111111;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.filter-title {
+    color: #00e5ff;
+    font-size: 14px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.linha-roxa {
+    width: 4px;
+    height: 16px;
+    background-color: #8a2be2;
+    border-radius: 2px;
+}
+
+.filter-options { display: flex; flex-direction: column; gap: 12px; }
+.filter-options label { display: flex; align-items: center; color: #fff; cursor: pointer; gap: 10px; }
+.filter-options input[type="radio"] { accent-color: #00e5ff; cursor: pointer; }
+
+/* ==========================================
+   5. AJUSTES DE ESTADO DO BODY
+   ========================================== */
+body.cart-open {
+    padding-right: 380px !important;
+    overflow-x: hidden;
+}
+
+.escondido {
+    display: none !important;
+}
+
+/* Opcional: estilo para quando o botão estiver selecionado */
+.cat-card.ativo {
+    border: 2px solid #00e5ff; /* Exemplo de destaque */
+    background-color: #2a2a2a;
+}
+
+/* Container que vai rolar */
+.lista-produtos {
+    /* Define o limite de altura. 
+       vh = percentual da altura da tela (ex: 50% da altura) */
+    max-height: 50vh; 
+    
+    /* Ativa a barra de rolagem apenas quando necessário */
+    overflow-y: auto; 
+    
+    /* Garante que o layout não quebre */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Opcional: Deixa a barra de rolagem com um visual mais moderno */
+.lista-produtos::-webkit-scrollbar {
+    width: 8px;
+}
+.lista-produtos::-webkit-scrollbar-thumb {
+    background-color: #7b2cbf; /* Roxo do seu tema */
+    border-radius: 4px;
+}
+
+/* Container que armazena os produtos do carrinho */
+#cart-items-container {
+    /* Define uma altura máxima para o container. 
+       vh = percentual da altura total da tela */
+    max-height: 60vh; 
+    
+    /* Ativa a barra de rolagem vertical automaticamente quando os itens excederem a altura */
+    overflow-y: auto;
+    
+    /* Adiciona um padding para os itens não colarem na borda */
+    padding: 10px;
+    
+    /* Garante que o layout se comporte corretamente */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Opcional: Estilização da barra de rolagem para combinar com seu design */
+#cart-items-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#cart-items-container::-webkit-scrollbar-thumb {
+    background-color: #6a0dad; /* Cor roxa similar ao seu tema */
+    border-radius: 4px;
+}
+
+#cart-items-container::-webkit-scrollbar-track {
+    background: #1e1e1e; /* Cor do fundo do seu carrinho */
+}
+
+.checkout-btn {
+    /* Estilo Base */
+    background: linear-gradient(90deg, #7b2cbf, #5a189a);
+    color: #ffffff;
+    border: none;
+    padding: 15px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 8px; /* Cantos arredondados modernos */
+    transition: all 0.3s ease; /* Suaviza a animação */
+    width: 100%; /* Faz o botão ocupar toda a largura do carrinho */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Efeito de interação ao passar o mouse */
+.checkout-btn:hover {
+    background: linear-gradient(90deg, #9d4edd, #7b2cbf);
+    transform: translateY(-2px); /* Efeito de elevação */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Efeito de clique */
+.checkout-btn:active {
+    transform: translateY(0);
+}
+
+/* Container que envolve o ícone e o número */
+.cart-link {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: white;
+}
+
+.auth-link {
+    color: #ffffff;          /* Cor branca */
+    text-decoration: none;   /* Remove o sublinhado */
+    transition: color 0.3s;  /* Suaviza a troca de cor */
+}
+
+.auth-link:hover {
+    color: #7b2cbf;          /* Cor roxa ao passar o mouse */
+}
+
+/* 1. Container que mantém o ícone e o texto lado a lado */
+.cart-link {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    margin-right: 15px; /* Adiciona um espaço extra à direita para o badge flutuar */
+    padding-right: 5px; /* Garante que o badge não corte o texto */
+}
+
+/* 2. O Badge (círculo roxo) */
+#cart-count {
+    position: absolute;
+    top: -12px;
+    right: -12px; /* Ajuste para puxar para fora do ícone */
+    
+    /* Configuração de tamanho para não ser enorme */
+    min-width: 18px;
+    height: 18px;
+    
+    background-color: #7b2cbf;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: bold;
+    
+    /* Centraliza o número dentro do círculo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    border-radius: 50%;
+    border: 2px solid #121212;
+    z-index: 10; /* Garante que ele fique sempre em cima */
+}
