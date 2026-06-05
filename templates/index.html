@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoreByte | Hardware & Games</title>
     <!-- Fontes e Ícones -->
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="/static/css/index.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Orbitron:wght@700&display=swap" rel="stylesheet">
     
     <style>
@@ -159,7 +159,7 @@
     <!-- LINHA 1: É aqui que o Flexbox vai alinhar Logo, Busca e Login -->
     <div class="header-top">
         <div class="logo">
-            <img src="Corebyte.png" alt="CoreByte">
+            <img src="/static/img/Corebyte.png" alt="CoreByte">
         </div>
 
         <div class="search-bar">
@@ -712,7 +712,7 @@
         <!-- Headsets 8 -->
         <!-- Este mouse está em promoção -->
         <div class="product-card headset show logitech promo">
-            <img src="https://images4.kabum.com.br/produtos/fotos/1003744/headset-gamer-sem-fio-logitech-g325-lightspeed-bluetooth-audio-24-bits-compativel-com-pc-ps4-ps5-e-nintendo-switch-preto-981-001523_1776084880_gg.jpg" class="product-img">
+            <img src="https://m.magazineluiza.com.br/a-static/420x420/headset-gamer-sem-fio-logitech-g325-lightspeed-bluetooth-audio-24-bits-compativel-com-pc-ps4-ps5-e-nintendo-switch-preto-981-001523/kabum/1003744/3c95a864f0bdef34ac45c8ec671b5103.jpeg" class="product-img">
             <div class="product-info">
             <span class="badge">-15%</span>
                 <h3>Headset Gamer Sem Fio Logitech G325 LIGHTSPEED</h3>
@@ -721,7 +721,7 @@
       <button class="add-to-cart-btn" 
         data-name="Headset Gamer Sem Fio Logitech G325 LIGHTSPEED" 
         data-price="594,90" 
-        data-image="https://images4.kabum.com.br/produtos/fotos/1003744/headset-gamer-sem-fio-logitech-g325-lightspeed-bluetooth-audio-24-bits-compativel-com-pc-ps4-ps5-e-nintendo-switch-preto-981-001523_1776084880_gg.jpg"> <!-- Adicione isso aqui! -->
+        data-image="https://m.magazineluiza.com.br/a-static/420x420/headset-gamer-sem-fio-logitech-g325-lightspeed-bluetooth-audio-24-bits-compativel-com-pc-ps4-ps5-e-nintendo-switch-preto-981-001523/kabum/1003744/3c95a864f0bdef34ac45c8ec671b5103.jpeg"> <!-- Adicione isso aqui! -->
     ADICIONAR
 </button>
             </div>
@@ -1092,7 +1092,24 @@
     </div>
 </div>
 
-<script src="body.js"></script>
+<button id="chatbot-help-button" class="chatbot-help-button" type="button" aria-label="Abrir ajuda">
+    ?
+</button>
+
+<section id="chatbot-panel" class="chatbot-panel" aria-label="Chatbot de ajuda" aria-hidden="true">
+    <div class="chatbot-header">
+        <div>
+            <strong>Assistente CoreByte</strong>
+            <span>IA simbolica</span>
+        </div>
+        <button id="chatbot-close" type="button" aria-label="Fechar ajuda">&times;</button>
+    </div>
+
+    <div id="chatbot-messages" class="chatbot-messages"></div>
+    <div id="chatbot-options" class="chatbot-options"></div>
+</section>
+
+<script src="/static/js/body.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
