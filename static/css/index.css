@@ -1,26 +1,39 @@
 /* ==========================================
    1. LAYOUT GERAL E HEADER
    ========================================== */
+body > header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 176px;
+    gap: 26px;
+    padding: 0 5%;
+    background: #151515;
+}
+
 .header-top {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 5%;
-    gap: 30px;
-    width: 100%;
+    padding: 0;
+    gap: 28px;
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .search-bar {
     display: flex;
     position: relative;
-    flex: 3;
+    flex: 1 1 620px;
     max-width: 900px;
-    min-width: 400px;
+    min-width: 320px;
 }
 
 .search-bar input {
     width: 100%;
-    padding: 12px 45px 12px 15px;
+    height: 44px;
+    padding: 0 48px 0 15px;
     border: none;
     border-radius: 4px;
     outline: none;
@@ -38,15 +51,60 @@
 }
 
 .logo img {
-    height: 120px;
+    height: 150px;
     width: auto;
     display: block;
+}
+
+.user-menu {
+    flex: 0 0 auto;
+    color: #ffffff;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.header-right {
+    flex: 0 0 auto;
+    justify-self: end;
+}
+
+.header-bottom {
+    flex: 0 0 auto;
+    width: auto;
 }
 
 .nav-links {
     display: flex;
     list-style: none;
     gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+}
+
+body .hero {
+    min-height: 400px;
+    height: 400px;
+    margin-bottom: 0;
+}
+
+body .main-content {
+    align-items: flex-start;
+}
+
+main .products-grid {
+    min-width: 0;
+}
+
+aside {
+    max-width: 100%;
 }
 
 /* ==========================================
@@ -67,6 +125,7 @@
     flex-direction: column;
     padding: 25px;
     border-left: 2px solid #8a2be2;
+    max-width: 100vw;
 }
 
 .cart-sidebar.open { right: 0; }
@@ -102,11 +161,10 @@
    ========================================== */
 /* Remove qualquer transição e efeito de opacidade */
 .product-card {
-    transition: none !important;
-    animation: none !important;
+    transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
     opacity: 1 !important;
-    transform: none !important;
     visibility: visible !important;
+    min-width: 0;
 }
 
 /* Oculta instantaneamente */
@@ -168,7 +226,7 @@
    5. AJUSTES DE ESTADO DO BODY
    ========================================== */
 body.cart-open {
-    padding-right: 380px !important;
+    padding-right: 0 !important;
     overflow-x: hidden;
 }
 
@@ -315,4 +373,218 @@ body.cart-open {
     border-radius: 50%;
     border: 2px solid #121212;
     z-index: 10; /* Garante que ele fique sempre em cima */
+}
+
+/* ==========================================
+   6. CHATBOT SIMBOLICO
+   ========================================== */
+.chatbot-help-button {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 58px;
+    height: 58px;
+    border: 0;
+    border-radius: 50%;
+    background: #101014;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 800;
+    cursor: pointer;
+    border: 2px solid #00e5ff;
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.28);
+    z-index: 9000;
+}
+
+.chatbot-help-button:hover {
+    background: #15151c;
+    color: #00e5ff;
+    transform: translateY(-2px);
+}
+
+.chatbot-panel {
+    position: fixed;
+    right: 24px;
+    bottom: 92px;
+    width: min(360px, calc(100vw - 32px));
+    max-height: min(620px, calc(100vh - 120px));
+    background: #121212;
+    border: 1px solid #262626;
+    border-top: 2px solid #00e5ff;
+    color: #ffffff;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.65);
+    z-index: 9000;
+}
+
+.chatbot-panel.open {
+    display: flex;
+}
+
+.chatbot-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #252525;
+    background: #161616;
+}
+
+.chatbot-header strong,
+.chatbot-header span {
+    display: block;
+}
+
+.chatbot-header strong {
+    color: #00e5ff;
+    font-size: 15px;
+}
+
+.chatbot-header span {
+    color: #a7a7b3;
+    font-size: 12px;
+}
+
+#chatbot-close {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #343434;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.chatbot-messages {
+    padding: 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chatbot-message {
+    max-width: 88%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.chatbot-message.bot {
+    align-self: flex-start;
+    background: #1a1a1a;
+    border: 1px solid #292929;
+}
+
+.chatbot-message.user {
+    align-self: flex-end;
+    background: #242424;
+    border: 1px solid #7000ff;
+}
+
+.chatbot-options {
+    display: grid;
+    gap: 8px;
+    padding: 12px 14px 14px;
+    border-top: 1px solid #252525;
+}
+
+.chatbot-option {
+    border: 1px solid #2b2b2b;
+    background: #181818;
+    color: #ffffff;
+    padding: 10px 12px;
+    text-align: left;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.chatbot-option:hover {
+    border-color: #00e5ff;
+    color: #00e5ff;
+    background: #111111;
+}
+
+@media (max-width: 520px) {
+    .chatbot-help-button {
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .chatbot-panel {
+        right: 16px;
+        bottom: 84px;
+    }
+}
+
+@media (max-width: 900px) {
+    body > header {
+        min-height: auto;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding-block: 18px;
+    }
+
+    .header-top {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .logo img {
+        height: 40px;
+    }
+
+    .search-bar {
+        order: 2;
+        flex-basis: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .user-menu {
+        order: 3;
+        font-size: 13px;
+        white-space: normal;
+    }
+
+    .header-right {
+        order: 4;
+    }
+
+    .header-bottom {
+        order: 5;
+    }
+
+    body .main-content {
+        padding-inline: 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    body > header {
+        padding-inline: 16px;
+    }
+
+    .categories {
+        padding-inline: 16px;
+        gap: 10px;
+    }
+
+    .cat-card {
+        flex: 1 1 calc(50% - 10px);
+        min-width: 120px;
+        padding: 18px 10px;
+    }
+
+    main .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cart-sidebar {
+        right: -100vw;
+        width: min(380px, 100vw);
+    }
 }
