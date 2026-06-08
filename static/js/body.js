@@ -3,6 +3,23 @@
 // ==========================================
 let carrinhoItens = [];
 
+function converterPrecoParaNumero(preco) {
+    const precoNormalizado = String(preco)
+        .replace('R$', '')
+        .replace(/\./g, '')
+        .replace(',', '.')
+        .trim();
+
+    return Number(precoNormalizado) || 0;
+}
+
+function formatarPrecoBR(valor) {
+    return valor.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+}
+
 function atualizarInterfaceCarrinho() {
     const listaCarrinhoUI = document.getElementById('cart-items-container');
     if (!listaCarrinhoUI) return;
@@ -10,7 +27,7 @@ function atualizarInterfaceCarrinho() {
     let totalGeral = 0;
 
     carrinhoItens.forEach((item, index) => {
-        totalGeral += parseFloat(item.preco);
+        totalGeral += converterPrecoParaNumero(item.preco);
         listaCarrinhoUI.innerHTML += `
             <div class="cart-item-row">
                 <img src="${item.imagem}" alt="${item.nome}" style="width: 50px; height: 50px; object-fit: contain; margin-right: 10px;">
@@ -23,7 +40,7 @@ function atualizarInterfaceCarrinho() {
         `;
     });
     const totalUI = document.getElementById('total-price');
-    if (totalUI) totalUI.innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+    if (totalUI) totalUI.innerText = formatarPrecoBR(totalGeral);
 }
 
 function atualizarContadorCarrinho() {
@@ -100,7 +117,8 @@ document.addEventListener("DOMContentLoaded", function() {
         botao.addEventListener('click', function() {
             const nome = this.getAttribute('data-name');
             const preco = this.getAttribute('data-price');
-            const imagem = this.getAttribute('data-image');
+            const imagemDoCard = this.closest('.product-card')?.querySelector('.product-img')?.src;
+            const imagem = imagemDoCard || this.getAttribute('data-image');
             
             if (nome && preco) {
                 carrinhoItens.push({ nome, preco, imagem });
@@ -515,3 +533,60 @@ function abrirCarrinhoChatbot() {
     if (sidebar) sidebar.classList.add('open');
     document.body.classList.add('cart-open');
 }
+
+// ==========================================
+// 5. LOGIN VISUAL NA HOME
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const homeLogoLink = document.getElementById('home-logo-link');
+    if (homeLogoLink) {
+        homeLogoLink.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            if (window.location.port && window.location.port !== '8000') {
+                window.location.href = '/templates/index.html';
+            } else {
+                window.location.href = '/';
+            }
+        });
+    }
+
+    const authStatus = document.getElementById('auth-status');
+    if (!authStatus) return;
+
+    const liveServerMode = window.location.port && window.location.port !== '8000';
+    const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+        const [key, value] = cookie.trim().split('=');
+        if (key) acc[key] = decodeURIComponent(value || '');
+        return acc;
+    }, {});
+
+    const usuarioNome = localStorage.getItem('corebyte_usuario_nome') || cookies.corebyte_usuario_nome;
+
+    if (usuarioNome) {
+        authStatus.innerHTML = `
+            <span class="logged-user">
+                <span class="logged-greeting">Olá, <strong>${usuarioNome}</strong></span>
+                <a href="#" class="logout-link" id="logout-link">Sair</a>
+            </span>
+        `;
+
+        document.getElementById('logout-link').addEventListener('click', (event) => {
+            event.preventDefault();
+            localStorage.removeItem('corebyte_usuario_logado');
+            localStorage.removeItem('corebyte_usuario_nome');
+
+            if (liveServerMode) {
+                window.location.reload();
+            } else {
+                window.location.href = '/logout/';
+            }
+        });
+
+        return;
+    }
+
+    if (liveServerMode) {
+        authStatus.innerHTML = 'Olá, <a href="/templates/Login.html" class="auth-link">Entre</a> ou <a href="/templates/cadastro.html" class="auth-link">Cadastre-se</a>';
+    }
+});

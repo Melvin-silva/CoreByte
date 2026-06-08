@@ -43,6 +43,17 @@
     display: block;
 }
 
+.logo a {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.logo a:hover img {
+    filter: brightness(1.12);
+}
+
 .nav-links {
     display: flex;
     list-style: none;
@@ -281,6 +292,45 @@ body.cart-open {
 
 .auth-link:hover {
     color: #7b2cbf;          /* Cor roxa ao passar o mouse */
+}
+
+.logged-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    color: #ffffff;
+}
+
+.logged-greeting {
+    color: #d9d9e3;
+    font-size: 14px;
+}
+
+.logged-greeting strong {
+    color: #00e5ff;
+    font-weight: 800;
+}
+
+.logout-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 14px;
+    border: 1px solid #2f2f38;
+    border-radius: 6px;
+    background: #18181f;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.logout-link:hover {
+    border-color: #00e5ff;
+    color: #00e5ff;
+    background: #111116;
 }
 
 /* 1. Container que mantém o ícone e o texto lado a lado */
@@ -611,4 +661,48 @@ body.cart-open {
         right: 16px;
         bottom: 84px;
     }
+}
+.cart-icon {
+    width: 30px;
+    height: 30px;
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.2s ease, transform 0.2s ease;
+}
+
+.cart-link:hover .cart-icon {
+    stroke: #00e5ff;
+    transform: translateY(-1px);
+}
+
+.cart-link #cart-count {
+    top: -14px;
+    right: -14px;
+}
+.search-bar .search-btn {
+    right: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+}
+
+.search-icon {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: #101014;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.2s ease, transform 0.2s ease;
+}
+
+.search-bar .search-btn:hover .search-icon {
+    stroke: #7000ff;
+    transform: scale(1.04);
 }

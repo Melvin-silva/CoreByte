@@ -4,45 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoreByte - Criar Conta</title>
-    <link rel="stylesheet" href="../static/css/cadastro.css">
+    <link rel="stylesheet" href="/static/css/cadastro.css">
 </head>
 <body>
-
     <div class="cadastro-screen">
         <main class="container-box cadastro-container">
-            
             <section class="form-wrapper">
                 <div class="logo-container">
-                    <img src="Corebyte.png" alt="CoreByte Logo" class="corebyte-logo">
+                    <img src="/static/img/Corebyte.png" alt="CoreByte Logo" class="corebyte-logo">
                 </div>
-                
+
                 <h2>Crie a sua Conta</h2>
                 <p class="desc-text">Preencha os campos abaixo para se registrar na plataforma.</p>
 
-                <form onsubmit="validarECadastrar(event)">
+                <p id="cadastro-error" class="form-error" hidden>As senhas nao coincidem. Por favor, verifique.</p>
+
+                <form id="cadastro-form" method="post" action="/cadastro/">
                     <div class="field-container">
-                        <input type="text" placeholder="Nome completo" required>
+                        <input type="text" name="nome" placeholder="Nome completo" required>
                     </div>
 
                     <div class="field-container">
-                        <input type="email" placeholder="Seu e-mail principal" required>
-                    </div>
-                    
-                    <div class="field-container">
-                        <input type="password" placeholder="Crie uma senha forte" required>
+                        <input type="email" name="email" placeholder="Seu e-mail principal" required>
                     </div>
 
                     <div class="field-container">
-                        <input type="password" placeholder="Confirme a sua senha" required>
+                        <input type="password" name="senha" placeholder="Crie uma senha forte" required>
+                    </div>
+
+                    <div class="field-container">
+                        <input type="password" name="confirmar_senha" placeholder="Confirme a sua senha" required>
                     </div>
 
                     <div class="terms-check">
                         <input type="checkbox" id="accept-terms" required>
-                        <label for="accept-terms">Li e aceito os Termos de Serviço</label>
+                        <label for="accept-terms">Li e aceito os Termos de Servico</label>
                     </div>
 
                     <button type="submit" class="btn-cadastro-verde">CONCLUIR CADASTRO</button>
-                    <button type="button" class="btn-cadastro-borda" onclick="window.location.href='login.html'">JÁ TENHO CONTA</button>
+                    <button type="button" class="btn-cadastro-borda" id="go-login">JA TENHO CONTA</button>
                 </form>
             </section>
 
@@ -51,29 +51,45 @@
                     <p class="tagline">NIVELADO PARA</p>
                     <h1>VENCER</h1>
                     <div class="neon-line"></div>
-                    <p class="sub-desc">Junte-se à nossa comunidade e monte o setup dos seus sonhos.</p>
+                    <p class="sub-desc">Junte-se a nossa comunidade e monte o setup dos seus sonhos.</p>
                 </div>
             </section>
-
         </main>
     </div>
-
     <script>
-    function validarECadastrar(event) {
-    event.preventDefault();
-    const inputs = document.querySelectorAll('.field-container input[type="password"]');
-    const senha = inputs[0].value;
-    const confirmaSenha = inputs[1].value;
+    document.getElementById('go-login').addEventListener('click', function() {
+        if (window.location.port && window.location.port !== '8000') {
+            window.location.href = '/templates/Login.html';
+        } else {
+            window.location.href = '/login/';
+        }
+    });
 
-    if (senha !== confirmaSenha) {
-        alert("As senhas não coincidem! Por favor, verifique.");
-        return false;
-    }
+    document.getElementById('cadastro-form').addEventListener('submit', function(event) {
+        const senha = this.elements.senha.value;
+        const confirmarSenha = this.elements.confirmar_senha.value;
 
-    // MUDANÇA AQUI: Avisa que deu certo e joga o usuário para a tela de login
-    alert("Cadastro concluído com sucesso!");
-    window.location.href = 'login.html'; 
-}
+        if (senha !== confirmarSenha) {
+            event.preventDefault();
+            document.getElementById('cadastro-error').hidden = false;
+            return;
+        }
+
+        if (window.location.port && window.location.port !== '8000') {
+            event.preventDefault();
+            const nome = this.elements.nome.value.trim();
+            const email = this.elements.email.value.trim();
+
+            localStorage.setItem('corebyte_nome_cadastrado', nome || email.split('@')[0]);
+            localStorage.setItem('corebyte_email_cadastrado', email);
+            localStorage.setItem('corebyte_senha_cadastrada', senha);
+            localStorage.removeItem('corebyte_usuario_logado');
+            localStorage.removeItem('corebyte_usuario_nome');
+
+            alert('Cadastro concluido com sucesso! Entre com sua conta para confirmar.');
+            window.location.href = '/templates/Login.html';
+        }
+    });
     </script>
 </body>
 </html>

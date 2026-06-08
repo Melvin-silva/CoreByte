@@ -1,31 +1,31 @@
-t<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoreByte - Acessar a Conta</title>
-    <link rel="stylesheet" href="../static/css/Login.css">
+    <link rel="stylesheet" href="/static/css/Login.css">
 </head>
 <body>
-
     <div class="login-screen-central">
         <main class="container-box login-container">
-            
             <section class="form-wrapper">
                 <div class="logo-container">
-                    <img src="Corebyte.png" alt="CoreByte Logo" class="corebyte-logo">
+                    <img src="/static/img/Corebyte.png" alt="CoreByte Logo" class="corebyte-logo">
                 </div>
-                
+
                 <h2>Acesse a sua Conta</h2>
                 <p class="desc-text">Insira os seus dados para entrar na plataforma.</p>
 
-                <form onsubmit="validarELogar(event)">
+                <p id="login-error" class="form-error" hidden>Credenciais incorretas. Use o e-mail e a senha cadastrados.</p>
+
+                <form id="login-form" method="post" action="/login/">
                     <div class="field-container">
-                        <input type="email" placeholder="E-mail, CPF ou CNPJ" required>
+                        <input type="email" name="email" placeholder="E-mail, CPF ou CNPJ" required>
                     </div>
-                    
+
                     <div class="field-container">
-                        <input type="password" placeholder="Sua senha" required>
+                        <input type="password" name="senha" placeholder="Sua senha" required>
                     </div>
 
                     <div class="terms-check">
@@ -34,7 +34,7 @@ t<!DOCTYPE html>
                     </div>
 
                     <button type="submit" class="btn-login-verde">ENTRAR</button>
-                    <button type="button" class="btn-login-borda" onclick="window.location.href='cadastro.html'">CRIAR CONTA</button>
+                    <button type="button" class="btn-login-borda" id="go-cadastro">CRIAR CONTA</button>
                 </form>
             </section>
 
@@ -43,21 +43,54 @@ t<!DOCTYPE html>
                     <p class="tagline">NIVELADO PARA</p>
                     <h1>VENCER</h1>
                     <div class="neon-line"></div>
-                    <p class="sub-desc">Equipamentos de elite para quem não aceita o segundo lugar.</p>
+                    <p class="sub-desc">Equipamentos de elite para quem nao aceita o segundo lugar.</p>
                 </div>
             </section>
-
         </main>
     </div>
-
     <script>
-    function validarELogar(event) {
-        event.preventDefault();
-        
-        // Aqui você pode adicionar futuras validações de login se quiser.
-        // Por enquanto, se os campos exigidos (required) estiverem preenchidos, ele entra:
-        window.location.href = 'index.html'; 
+    const loginError = document.getElementById('login-error');
+
+    if (new URLSearchParams(window.location.search).get('erro') === 'credenciais') {
+        loginError.hidden = false;
     }
+
+    document.getElementById('go-cadastro').addEventListener('click', function() {
+        if (window.location.port && window.location.port !== '8000') {
+            window.location.href = '/templates/cadastro.html';
+        } else {
+            window.location.href = '/cadastro/';
+        }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        const email = this.elements.email.value.trim();
+        const senha = this.elements.senha.value;
+
+        if (!email || !senha) {
+            event.preventDefault();
+            loginError.textContent = 'Informe e-mail e senha para entrar.';
+            loginError.hidden = false;
+            return;
+        }
+
+        if (window.location.port && window.location.port !== '8000') {
+            event.preventDefault();
+            const emailCadastrado = localStorage.getItem('corebyte_email_cadastrado');
+            const senhaCadastrada = localStorage.getItem('corebyte_senha_cadastrada');
+            const nomeCadastrado = localStorage.getItem('corebyte_nome_cadastrado');
+
+            if (email !== emailCadastrado || senha !== senhaCadastrada) {
+                loginError.textContent = 'Credenciais incorretas. Use o e-mail e a senha cadastrados.';
+                loginError.hidden = false;
+                return;
+            }
+
+            localStorage.setItem('corebyte_usuario_logado', email);
+            localStorage.setItem('corebyte_usuario_nome', nomeCadastrado || email.split('@')[0]);
+            window.location.href = '/templates/index.html';
+        }
+    });
     </script>
 </body>
 </html>

@@ -12,7 +12,31 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
-from decouple import Csv, config
+try:
+    from decouple import Csv, config
+except ModuleNotFoundError:
+    class Csv:
+        def __call__(self, value):
+            return [item.strip() for item in value.split(',') if item.strip()]
+
+    def config(key, default=None, cast=None):
+        value = default
+        if value is None:
+            fallback_values = {
+                'SECRET_KEY': 'django-insecure-dev-corebyte',
+                'DB_NAME': 'CoreByte',
+                'DB_USER': 'postgres',
+                'DB_PASSWORD': '',
+            }
+            value = fallback_values.get(key, '')
+
+        if cast is bool:
+            return str(value).lower() in ('1', 'true', 'yes', 'on')
+
+        if cast:
+            return cast(value)
+
+        return value
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -123,6 +147,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 
 # Static files (CSS, JavaScript, Images)

@@ -288,3 +288,18 @@ body, html {
 .cadastro-container .field-container {
     margin-bottom: 12px !important;
 }
+.cadastro-container .corebyte-logo {
+    max-width: 210px !important;
+    height: auto !important;
+}
+
+.form-error {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.08);
+    border: 1px solid rgba(255, 107, 107, 0.28);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    text-align: center;
+}
