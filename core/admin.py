@@ -11,7 +11,7 @@ class CategoriaAdmin(admin.ModelAdmin):
 
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
-    list_display = ("imagem_url","nome", "categoria", "tipo", "valor", "criado_em")
+    list_display = ("imagem","nome", "categoria", "tipo", "valor", "criado_em")
     search_fields = ("nome", "categoria__nome", "tipo")
     list_filter = ("categoria", "tipo")
 

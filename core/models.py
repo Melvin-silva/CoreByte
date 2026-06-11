@@ -14,7 +14,7 @@ class Categoria(models.Model):
         return self.nome
 
 class Produto(models.Model):
-    imagem_url = models.URLField(blank=True, null=True)
+    imagem = models.ImageField(upload_to="produtos/", blank=True, null=True)
     nome = models.CharField(max_length=100, verbose_name="Nome")
     categoria = models.ForeignKey(
         Categoria,
