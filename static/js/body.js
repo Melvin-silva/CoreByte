@@ -3,6 +3,18 @@
 // ==========================================
 let carrinhoItens = [];
 
+function carregarCarrinhoSalvo() {
+    try {
+        carrinhoItens = JSON.parse(localStorage.getItem('corebyte_carrinho')) || [];
+    } catch {
+        carrinhoItens = [];
+    }
+}
+
+function salvarCarrinho() {
+    localStorage.setItem('corebyte_carrinho', JSON.stringify(carrinhoItens));
+}
+
 function converterPrecoParaNumero(preco) {
     const precoNormalizado = String(preco)
         .replace('R$', '')
@@ -50,6 +62,7 @@ function atualizarContadorCarrinho() {
 
 window.removerDoCarrinho = (index) => {
     carrinhoItens.splice(index, 1);
+    salvarCarrinho();
     atualizarInterfaceCarrinho();
     atualizarContadorCarrinho();
 };
@@ -88,6 +101,9 @@ function filtrarSubCategoria(generoSelecionado) {
 // 3. INICIALIZAÇÃO ÚNICA (EVENTOS)
 // ==========================================
 document.addEventListener("DOMContentLoaded", function() {
+    carregarCarrinhoSalvo();
+    atualizarInterfaceCarrinho();
+    atualizarContadorCarrinho();
     
     // Configurações do Carrinho
     const cartBtn = document.querySelector('.cart-link');
@@ -122,6 +138,7 @@ document.addEventListener("DOMContentLoaded", function() {
             
             if (nome && preco) {
                 carrinhoItens.push({ nome, preco, imagem });
+                salvarCarrinho();
                 atualizarInterfaceCarrinho();
                 atualizarContadorCarrinho();
                 
@@ -218,6 +235,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            const destino = window.location.port && window.location.port !== '8000'
+                ? '/templates/carrinho.html'
+                : '/carrinho/';
+
+            window.location.href = destino;
+        });
+    }
 });
 
 // ==========================================
@@ -535,9 +563,112 @@ function abrirCarrinhoChatbot() {
 }
 
 // ==========================================
-// 5. LOGIN VISUAL NA HOME
+// 5. CARROSSEL DO HERO
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    const carousel = document.querySelector('.hero-carousel');
+    if (!carousel) return;
+
+    const slides = Array.from(carousel.querySelectorAll('.hero-slide'));
+    const track = carousel.querySelector('.hero-carousel-track');
+    const prevButton = carousel.querySelector('.hero-carousel-btn.prev');
+    const nextButton = carousel.querySelector('.hero-carousel-btn.next');
+    const dotsContainer = carousel.querySelector('.hero-carousel-dots');
+    const usarTransicaoLateral = slides.every((slide) => slide.classList.contains('banner-image-slide'));
+    let currentSlide = 0;
+    let intervalId;
+
+    function normalizarTexto(texto) {
+        return String(texto)
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+    }
+
+    slides.forEach((slide) => {
+        const termo = normalizarTexto(slide.dataset.match || '');
+        if (!termo) return;
+
+        const produto = Array.from(document.querySelectorAll('.product-card')).find((card) => {
+            const nome = normalizarTexto(card.querySelector('h3')?.textContent || '');
+            return nome.includes(termo);
+        });
+
+        const precoReal = produto?.querySelector('.current-price')?.textContent.trim();
+        const precoSlide = slide.querySelector('p');
+        if (precoReal && precoSlide) {
+            precoSlide.textContent = precoReal;
+        }
+    });
+
+    function showSlide(index) {
+        currentSlide = (index + slides.length) % slides.length;
+
+        slides.forEach((slide, slideIndex) => {
+            slide.classList.toggle('active', slideIndex === currentSlide);
+        });
+
+        if (usarTransicaoLateral && track) {
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+
+        dotsContainer?.querySelectorAll('.hero-carousel-dot').forEach((dot, dotIndex) => {
+            dot.classList.toggle('active', dotIndex === currentSlide);
+        });
+    }
+
+    function startAutoplay() {
+        clearInterval(intervalId);
+        intervalId = setInterval(() => {
+            showSlide(currentSlide + 1);
+        }, 4500);
+    }
+
+    slides.forEach((_, index) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'hero-carousel-dot';
+        dot.setAttribute('aria-label', `Produto ${index + 1}`);
+        dot.addEventListener('click', () => {
+            showSlide(index);
+            startAutoplay();
+        });
+        dotsContainer?.appendChild(dot);
+    });
+
+    prevButton?.addEventListener('click', () => {
+        showSlide(currentSlide - 1);
+        startAutoplay();
+    });
+
+    nextButton?.addEventListener('click', () => {
+        showSlide(currentSlide + 1);
+        startAutoplay();
+    });
+
+    showSlide(0);
+    startAutoplay();
+});
+
+// ==========================================
+// 6. LOGIN VISUAL NA HOME
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('corebyte_tema');
+
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const theme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+            localStorage.setItem('corebyte_tema', theme);
+        });
+    }
+
     const homeLogoLink = document.getElementById('home-logo-link');
     if (homeLogoLink) {
         homeLogoLink.addEventListener('click', (event) => {

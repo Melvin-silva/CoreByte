@@ -46,6 +46,9 @@ def cadastro_view(request):
 
     return render(request, 'cadastro.html')
 
+def carrinho_view(request):
+    return render(request, 'carrinho.html')
+
 def logout_view(request):
     request.session.flush()
     response = redirect('index')

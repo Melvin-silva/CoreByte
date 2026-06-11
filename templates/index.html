@@ -189,6 +189,15 @@
     <!-- Outros elementos como logo e busca -->
 
     <div class="header-right">
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar tema">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.2 15.6A8.5 8.5 0 0 1 8.4 3.8 8.5 8.5 0 1 0 20.2 15.6Z" />
+            </svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6" />
+            </svg>
+        </button>
         <a href="#" class="cart-link">
             <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M6.2 6h15.1l-1.8 8.6a2 2 0 0 1-2 1.6H8.8a2 2 0 0 1-2-1.6L5.2 3.8H2.5" />
@@ -212,6 +221,36 @@
     <div class="hero-content">
         <h1>NIVELADO PARA<br><span style="color:var(--primary)">VENCER</span></h1>
         <p>Equipamentos de elite para quem não aceita o segundo lugar.</p>
+    </div>
+
+    <div class="hero-carousel" aria-label="Produtos em destaque">
+        <button class="hero-carousel-btn prev" type="button" aria-label="Produto anterior">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" />
+            </svg>
+        </button>
+
+        <div class="hero-carousel-track">
+            <article class="hero-slide active banner-image-slide">
+                <img src="/static/img/banner-arraia-gamer.png" alt="Arraia Gamer CoreByte">
+            </article>
+
+            <article class="hero-slide banner-image-slide">
+                <img src="/static/img/banner-mega-ofertas.png" alt="Semana Gamer CoreByte">
+            </article>
+
+            <article class="hero-slide banner-image-slide">
+                <img src="/static/img/banner-gamer-corebyte.png" alt="Frete gratis CoreByte">
+            </article>
+        </div>
+
+        <button class="hero-carousel-btn next" type="button" aria-label="Proximo produto">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" />
+            </svg>
+        </button>
+
+        <div class="hero-carousel-dots" aria-hidden="true"></div>
     </div>
 </section>
 

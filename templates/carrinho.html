@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoreByte - Carrinho</title>
+    <link rel="stylesheet" href="/static/css/carrinho.css">
+</head>
+<body>
+    <header class="cart-page-header">
+        <a href="/" id="cart-home-link" class="cart-logo-link" aria-label="Voltar para a loja">
+            <img src="/static/img/Corebyte.png" alt="CoreByte">
+        </a>
+        <button id="continue-shopping" class="secondary-action" type="button">CONTINUAR COMPRANDO</button>
+    </header>
+
+    <main class="cart-page">
+        <section class="cart-content">
+            <div class="cart-title-block">
+                <span class="cart-kicker">MEU CARRINHO</span>
+                <h1>Revise seus produtos</h1>
+            </div>
+
+            <div id="cart-page-items" class="cart-page-items"></div>
+            <p id="empty-cart-message" class="empty-cart-message" hidden>Seu carrinho esta vazio.</p>
+        </section>
+
+        <aside class="cart-summary">
+            <h2>Resumo</h2>
+            <div class="summary-line">
+                <span>Itens</span>
+                <strong id="summary-count">0</strong>
+            </div>
+            <div class="summary-line total">
+                <span>Total</span>
+                <strong id="summary-total">R$ 0,00</strong>
+            </div>
+
+            <div class="payment-methods">
+                <h3>Pagamento</h3>
+                <label class="payment-option">
+                    <input type="radio" name="payment-method" value="Pix" checked>
+                    <span class="payment-icon">PIX</span>
+                    <span>Pix</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment-method" value="Cartao de credito">
+                    <span class="payment-icon">CC</span>
+                    <span>Cartao de credito</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment-method" value="Boleto">
+                    <span class="payment-icon">BL</span>
+                    <span>Boleto</span>
+                </label>
+            </div>
+
+            <button id="finish-order" class="primary-action" type="button">FINALIZAR COMPRA</button>
+            <button id="clear-cart" class="danger-action" type="button">LIMPAR CARRINHO</button>
+        </aside>
+    </main>
+
+    <script src="/static/js/carrinho.js"></script>
+</body>
+</html>
