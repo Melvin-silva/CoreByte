@@ -1,5 +1,5 @@
-// ==========================================
-// 1. VARIÁVEIS GLOBAIS E LÓGICA DE CARRINHO
+﻿// ==========================================
+// 1. VARIÃVEIS GLOBAIS E LÃ“GICA DE CARRINHO
 // ==========================================
 let carrinhoItens = [];
 
@@ -58,11 +58,19 @@ function atualizarInterfaceCarrinho() {
         listaCarrinhoUI.innerHTML += `
             <div class="cart-item-row">
                 <img src="${item.imagem}" alt="${item.nome}" style="width: 50px; height: 50px; object-fit: contain; margin-right: 10px;">
-                <div style="flex-grow: 1;">
+                <div style="flex: 1 1 auto; min-width: 0;">
                     <strong style="display:block; font-size: 14px;">${item.nome}</strong>
                     <span style="color: #00f2ff;">R$ ${item.preco}</span>
                 </div>
-                <button onclick="removerDoCarrinho(${index})" style="background:none; border:none; color: #ff4b2b; cursor:pointer;">🗑️</button>
+                <button class="cart-remove-btn" onclick="removerDoCarrinho(${index})" type="button" aria-label="Remover ${item.nome}">
+                    <svg width="21" height="21" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"></path>
+                        <path d="M6.5 6l1 14.2A2 2 0 0 0 9.5 22h5a2 2 0 0 0 2-1.8l1-14.2"></path>
+                        <path d="M10 11v6"></path>
+                        <path d="M14 11v6"></path>
+                    </svg>
+                </button>
             </div>
         `;
     });
@@ -83,7 +91,7 @@ window.removerDoCarrinho = (index) => {
 };
 
 // ==========================================
-// 2. FUNÇÕES DE FILTRAGEM
+// 2. FUNÃ‡Ã•ES DE FILTRAGEM
 // ==========================================
 function filtrar(marca) {
     document.querySelectorAll('.product-card').forEach(produto => {
@@ -113,14 +121,14 @@ function filtrarSubCategoria(generoSelecionado) {
 }
 
 // ==========================================
-// 3. INICIALIZAÇÃO ÚNICA (EVENTOS)
+// 3. INICIALIZAÃ‡ÃƒO ÃšNICA (EVENTOS)
 // ==========================================
 document.addEventListener("DOMContentLoaded", function() {
     carregarCarrinhoSalvo();
     atualizarInterfaceCarrinho();
     atualizarContadorCarrinho();
     
-    // Configurações do Carrinho
+    // ConfiguraÃ§Ãµes do Carrinho
     const cartBtn = document.querySelector('.cart-link');
     const closeBtn = document.getElementById('close-cart');
     const sidebar = document.getElementById('cart-sidebar');
@@ -143,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Botões "Adicionar ao Carrinho" - APENAS ESTE BLOCO
+    // BotÃµes "Adicionar ao Carrinho" - APENAS ESTE BLOCO
     document.querySelectorAll('.add-to-cart-btn').forEach(botao => {
         botao.addEventListener('click', function() {
             const nome = this.getAttribute('data-name');
@@ -177,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-function filtrarSeçãoPrincipal(categoriaSelecionada) {
+function filtrarSecaoPrincipal(categoriaSelecionada) {
     // 1. Seleciona todos os produtos
     const produtos = document.querySelectorAll('.product-card');
 
@@ -193,7 +201,7 @@ function filtrarSeçãoPrincipal(categoriaSelecionada) {
             produto.classList.remove('esconder-animado');
             produto.style.display = 'block';
         } 
-        // Caso contrário, esconde
+        // Caso contrÃ¡rio, esconde
         else {
             produto.classList.add('esconder-animado');
             produto.style.display = 'none';
@@ -218,7 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Adiciona no clicado
             this.classList.add('ativo');
 
-            // 3. Lógica do menu de jogos
+            const filtro = this.dataset.filter;
+            if (filtro) {
+                filtrarSecaoPrincipal(filtro);
+            }
+
+            // 3. LÃ³gica do menu de jogos
             if (this.id === 'btn-jogos') {
                 filtroJogos.classList.toggle('escondido');
             } else {
@@ -239,10 +252,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const cards = containerProdutos.querySelectorAll('.product-card');
 
         cards.forEach(card => {
-            // Pega o texto dentro do <h3> que está no seu product-info
+            // Pega o texto dentro do <h3> que estÃ¡ no seu product-info
             const nomeProduto = card.querySelector('h3').innerText.toLowerCase();
 
-            // Mostra se contiver o termo, esconde se não
+            // Mostra se contiver o termo, esconde se nÃ£o
             if (nomeProduto.includes(termo)) {
                 card.style.display = "block"; 
             } else {
@@ -701,6 +714,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!authStatus) return;
 
     const liveServerMode = isStaticPreview();
+    if (!liveServerMode) return;
+
     const cookies = document.cookie.split(';').reduce((acc, cookie) => {
         const [key, value] = cookie.trim().split('=');
         if (key) acc[key] = decodeURIComponent(value || '');
@@ -712,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (usuarioNome) {
         authStatus.innerHTML = `
             <span class="logged-user">
-                <span class="logged-greeting">Olá, <strong>${usuarioNome}</strong></span>
+                <span class="logged-greeting">OlÃ¡, <strong>${usuarioNome}</strong></span>
                 <a href="#" class="logout-link" id="logout-link">Sair</a>
             </span>
         `;
@@ -736,3 +751,5 @@ document.addEventListener('DOMContentLoaded', () => {
         authStatus.innerHTML = 'Ola, <a href="Login.html" class="auth-link">Entre</a> ou <a href="cadastro.html" class="auth-link">Cadastre-se</a>';
     }
 });
+
+

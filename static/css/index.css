@@ -103,7 +103,50 @@
 
 .cart-items { flex-grow: 1; overflow-y: auto; margin-bottom: 20px; scrollbar-width: thin; scrollbar-color: #8a2be2 #121212; }
 
-.cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #333; }
+.cart-item-row { display: flex; align-items: center; gap: 10px; padding: 15px 0; border-bottom: 1px solid #333; }
+
+.cart-remove-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255, 75, 43, 0.45);
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(255, 75, 43, 0.22), rgba(95, 18, 18, 0.9));
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(255, 75, 43, 0.16);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+}
+
+.cart-remove-btn svg {
+    display: block;
+    flex: 0 0 auto;
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.cart-remove-btn svg path,
+.cart-remove-btn svg polyline {
+    fill: none;
+    stroke: currentColor;
+}
+
+.cart-remove-btn:hover,
+.cart-remove-btn:focus-visible {
+    border-color: rgba(255, 120, 92, 0.95);
+    box-shadow: 0 10px 24px rgba(255, 75, 43, 0.28);
+    filter: brightness(1.08);
+    transform: translateY(-1px) scale(1.03);
+}
 
 .cart-footer { border-top: 1px solid #333; padding-top: 20px; }
 .cart-total { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 20px; }

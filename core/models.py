@@ -29,6 +29,14 @@ class Produto(models.Model):
         decimal_places=2,
         verbose_name="Valor",
     )
+    em_promocao = models.BooleanField(default=False, verbose_name="Em promocao")
+    valor_antigo = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Valor antigo",
+    )
     criado_em = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
     atualizado_em = models.DateTimeField(auto_now=True, verbose_name="Atualizado em")
 

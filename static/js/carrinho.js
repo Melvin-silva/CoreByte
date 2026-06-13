@@ -95,10 +95,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('finish-order').addEventListener('click', () => {
-        const metodo = document.querySelector('input[name="payment-method"]:checked')?.value || 'Pix';
-        alert(`Compra finalizada com sucesso! Metodo de pagamento: ${metodo}.`);
-        salvarCarrinho([]);
-        renderizarCarrinho();
+        if (!carregarCarrinho().length) {
+            alert('Seu carrinho esta vazio.');
+            return;
+        }
+
+        window.location.href = '/checkout/';
     });
 
     renderizarCarrinho();

@@ -11,6 +11,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('cadastro/', views.cadastro_view, name='cadastro'),
     path('carrinho/', views.carrinho_view, name='carrinho'),
+    path('checkout/', views.checkout_view, name='checkout'),
     path('logout/', views.logout_view, name='logout'),
     path('admin/', admin.site.urls),
 

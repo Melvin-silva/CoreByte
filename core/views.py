@@ -3,11 +3,63 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.utils.text import slugify
 
 from .forms import CadastroForm, LoginForm
+from .models import Produto
+
+
+def formatar_preco_br(valor):
+    return f"{valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def normalizar_slug(valor):
+    slug = slugify(valor)
+    equivalencias = {
+        "headseats": "headset",
+        "headsets": "headset",
+        "jogos": "jogo",
+        "mouses": "mouse",
+        "teclados": "teclado",
+        "controles": "controle",
+        "acao-aventura": "acao",
+    }
+    return equivalencias.get(slug, slug)
+
 
 def index(request):
-    return render(request, 'index.html')
+    produtos = []
+
+    for produto in Produto.objects.select_related("categoria").all():
+        categoria_slug = normalizar_slug(produto.categoria.nome)
+        tipo_slug = normalizar_slug(produto.tipo)
+        classes = " ".join(filter(None, [
+            tipo_slug,
+            "show",
+            categoria_slug,
+            "promo" if produto.em_promocao else "",
+        ]))
+        imagem_url = ""
+        if produto.imagem and produto.imagem.storage.exists(produto.imagem.name):
+            imagem_url = produto.imagem.url
+        valor_antigo = formatar_preco_br(produto.valor_antigo) if produto.valor_antigo else ""
+        badge = ""
+        if produto.em_promocao and produto.valor_antigo and produto.valor_antigo > produto.valor:
+            desconto = round((1 - (produto.valor / produto.valor_antigo)) * 100)
+            badge = f"-{desconto}%"
+
+        produtos.append({
+            "nome": produto.nome,
+            "imagem_url": imagem_url,
+            "preco": formatar_preco_br(produto.valor),
+            "valor_antigo": valor_antigo,
+            "badge": badge,
+            "categoria_slug": categoria_slug,
+            "tipo_slug": tipo_slug,
+            "classes": classes,
+        })
+
+    return render(request, 'index.html', {"produtos": produtos})
 
 def login_view(request):
     if request.method == 'POST':
@@ -55,6 +107,9 @@ def cadastro_view(request):
 
 def carrinho_view(request):
     return render(request, 'carrinho.html')
+
+def checkout_view(request):
+    return render(request, 'checkout.html')
 
 def logout_view(request):
     logout(request)

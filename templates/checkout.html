@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoreByte - Checkout</title>
+    <link rel="stylesheet" href="/static/css/checkout.css">
+</head>
+<body>
+    <header class="checkout-header">
+        <a href="/" class="checkout-logo-link" aria-label="Voltar para a loja">
+            <img src="/static/img/Corebyte.png" alt="CoreByte">
+        </a>
+        <a href="/carrinho/" class="secondary-action">VOLTAR AO CARRINHO</a>
+    </header>
+
+    <main class="checkout-page">
+        <section class="checkout-form-panel">
+            <div class="checkout-title-block">
+                <span class="checkout-kicker">CHECKOUT</span>
+                <h1>Finalizar pedido</h1>
+            </div>
+
+            <form id="checkout-form" class="checkout-form">
+                <fieldset>
+                    <legend>Dados do cliente</legend>
+                    <div class="form-grid two-columns">
+                        <label>
+                            Nome completo
+                            <input id="checkout-nome" name="nome" type="text" autocomplete="name" required>
+                        </label>
+                        <label>
+                            E-mail
+                            <input id="checkout-email" name="email" type="email" autocomplete="email" required>
+                        </label>
+                        <label>
+                            Telefone
+                            <input id="checkout-telefone" name="telefone" type="tel" autocomplete="tel" placeholder="(00) 00000-0000">
+                        </label>
+                        <label>
+                            CPF
+                            <input id="checkout-cpf" name="cpf" type="text" inputmode="numeric" placeholder="000.000.000-00">
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Entrega</legend>
+                    <div class="cep-row">
+                        <label>
+                            CEP
+                            <input id="checkout-cep" name="cep" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" required>
+                        </label>
+                        <button id="buscar-cep" class="secondary-action" type="button">BUSCAR CEP</button>
+                    </div>
+
+                    <p id="cep-status" class="cep-status" aria-live="polite"></p>
+
+                    <div class="form-grid two-columns">
+                        <label class="wide-field">
+                            Rua
+                            <input id="checkout-rua" name="rua" type="text" autocomplete="address-line1" required>
+                        </label>
+                        <label>
+                            Número
+                            <input id="checkout-numero" name="numero" type="text" autocomplete="address-line2" required>
+                        </label>
+                        <label>
+                            Bairro
+                            <input id="checkout-bairro" name="bairro" type="text" required>
+                        </label>
+                        <label>
+                            Complemento
+                            <input id="checkout-complemento" name="complemento" type="text" autocomplete="address-line3">
+                        </label>
+                        <label>
+                            Cidade
+                            <input id="checkout-cidade" name="cidade" type="text" autocomplete="address-level2" required>
+                        </label>
+                        <label>
+                            UF
+                            <input id="checkout-uf" name="uf" type="text" autocomplete="address-level1" maxlength="2" required>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Pagamento</legend>
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="payment-method" value="Pix" checked>
+                            <span>Pix</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment-method" value="Cartao de credito">
+                            <span>Cartão de crédito</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment-method" value="Boleto">
+                            <span>Boleto</span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <button id="confirm-order" class="primary-action" type="submit">CONFIRMAR PEDIDO</button>
+            </form>
+        </section>
+
+        <aside class="checkout-summary">
+            <h2>Resumo do pedido</h2>
+            <div id="checkout-items" class="checkout-items"></div>
+            <p id="checkout-empty" class="checkout-empty" hidden>Seu carrinho está vazio.</p>
+
+            <div class="summary-line">
+                <span>Itens</span>
+                <strong id="checkout-count">0</strong>
+            </div>
+            <div class="summary-line">
+                <span>Frete</span>
+                <strong id="checkout-shipping">A calcular</strong>
+            </div>
+            <div class="summary-line total">
+                <span>Total</span>
+                <strong id="checkout-total">R$ 0,00</strong>
+            </div>
+        </aside>
+    </main>
+
+    <script src="/static/js/checkout.js"></script>
+</body>
+</html>
