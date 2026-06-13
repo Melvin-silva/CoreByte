@@ -78,17 +78,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderizarResumoCheckout();
 
-    buscarCepButton.addEventListener('click', () => {
-        const cep = cepInput.value.replace(/\D/g, '');
+   buscarCepButton.addEventListener('click', async () => {
 
-        if (cep.length !== 8) {
-            cepStatus.textContent = 'Informe um CEP com 8 números.';
+    const cep = cepInput.value.replace(/\D/g, '');
+
+    if (cep.length !== 8) {
+        cepStatus.textContent = 'Informe um CEP com 8 números.';
+        return;
+    }
+
+    cepStatus.textContent = 'Buscando endereço...';
+
+    try {
+
+        const resposta = await fetch(
+            `https://viacep.com.br/ws/${cep}/json/`
+        );
+
+        const dados = await resposta.json();
+
+        if (dados.erro) {
+            cepStatus.textContent = 'CEP não encontrado.';
             return;
         }
 
-        cepStatus.textContent = 'CEP pronto para consulta da API.';
-        cepInput.dataset.normalizedCep = cep;
-    });
+        preencherEnderecoPorCep(dados);
+
+        cepStatus.textContent =
+            'Endereço preenchido automaticamente.';
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        cepStatus.textContent =
+            'Erro ao consultar o CEP.';
+    }
+});
 
     checkoutForm.addEventListener('submit', (event) => {
         event.preventDefault();
