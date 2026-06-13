@@ -23,11 +23,6 @@ db.sqlite3
 .env
 
 # =========================
-# Arquivos de mídia/uploads
-# =========================
-media/
-
-# =========================
 # Arquivos estáticos coletados
 # =========================
 staticfiles/
