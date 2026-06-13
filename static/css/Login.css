@@ -282,6 +282,7 @@ body, html {
     cursor: pointer !important;
     transition: all 0.2s ease !important;
     text-align: center !important;
+    text-decoration: none !important;
 }
 
 /* Botão Verde Limão de Entrar */

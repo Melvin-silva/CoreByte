@@ -1,48 +1,55 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import redirect, render
+
+from .forms import CadastroForm, LoginForm
 
 def index(request):
     return render(request, 'index.html')
 
-@csrf_exempt
 def login_view(request):
     if request.method == 'POST':
-        email = request.POST.get('email', '').strip()
-        senha = request.POST.get('senha', '')
-        email_cadastrado = request.session.get('email_cadastrado')
-        senha_cadastrada = request.session.get('senha_cadastrada')
-        nome_cadastrado = request.session.get('nome_cadastrado')
+        form = LoginForm(request.POST)
 
-        if email and senha and email == email_cadastrado and senha == senha_cadastrada:
-            request.session['usuario_logado'] = email
-            request.session['usuario_nome'] = nome_cadastrado or email.split('@')[0]
-            response = redirect('index')
-            response.set_cookie('corebyte_usuario_logado', email)
-            response.set_cookie('corebyte_usuario_nome', nome_cadastrado or email.split('@')[0])
-            return response
+        if form.is_valid():
+            email = form.cleaned_data['email'].strip().lower()
+            senha = form.cleaned_data['senha']
+            usuario = authenticate(request, username=email, password=senha)
 
-        return redirect('/login/?erro=credenciais')
+            if usuario is not None:
+                login(request, usuario)
+                messages.success(request, 'Login realizado com sucesso.')
+                return redirect('index')
+
+            messages.error(request, 'E-mail ou senha invalidos.')
+        else:
+            messages.error(request, 'Informe um e-mail e senha validos.')
 
     return render(request, 'Login.html')
 
-@csrf_exempt
 def cadastro_view(request):
     if request.method == 'POST':
-        nome = request.POST.get('nome', '').strip()
-        email = request.POST.get('email', '').strip()
-        senha = request.POST.get('senha', '')
-        confirmar_senha = request.POST.get('confirmar_senha', '')
+        form = CadastroForm(request.POST)
 
-        if senha != confirmar_senha:
-            return redirect('cadastro')
+        if form.is_valid():
+            nome = form.cleaned_data['nome'].strip()
+            email = form.cleaned_data['email']
+            senha = form.cleaned_data['senha']
 
-        request.session['email_cadastrado'] = email
-        request.session['senha_cadastrada'] = senha
-        request.session['nome_cadastrado'] = nome or email.split('@')[0]
+            User.objects.create_user(
+                username=email,
+                email=email,
+                password=senha,
+                first_name=nome,
+            )
+            messages.success(request, 'Cadastro realizado com sucesso. Entre com sua conta.')
+            return redirect('login')
 
-        return redirect('login')
+        for erros in form.errors.values():
+            for erro in erros:
+                messages.error(request, erro)
 
     return render(request, 'cadastro.html')
 
@@ -50,11 +57,9 @@ def carrinho_view(request):
     return render(request, 'carrinho.html')
 
 def logout_view(request):
-    request.session.flush()
-    response = redirect('index')
-    response.delete_cookie('corebyte_usuario_logado')
-    response.delete_cookie('corebyte_usuario_nome')
-    return response
+    logout(request)
+    messages.success(request, 'Voce saiu da sua conta.')
+    return redirect('index')
 
 def page_not_found_view(request, exception):
     return render(request, '404.html', status=404)

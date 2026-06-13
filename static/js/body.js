@@ -3,6 +3,21 @@
 // ==========================================
 let carrinhoItens = [];
 
+function isStaticPreview() {
+    return window.location.protocol === 'file:' || window.location.pathname.toLowerCase().includes('/templates/');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const authStatus = document.getElementById('auth-status');
+        const usuarioNome = localStorage.getItem('corebyte_usuario_nome');
+
+        if (authStatus && isStaticPreview() && !usuarioNome) {
+            authStatus.innerHTML = 'Ola, <a href="Login.html" class="auth-link">Entre</a> ou <a href="cadastro.html" class="auth-link">Cadastre-se</a>';
+        }
+    }, 0);
+});
+
 function carregarCarrinhoSalvo() {
     try {
         carrinhoItens = JSON.parse(localStorage.getItem('corebyte_carrinho')) || [];
@@ -239,8 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutBtn = document.querySelector('.checkout-btn');
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
-            const destino = window.location.port && window.location.port !== '8000'
-                ? '/templates/carrinho.html'
+            const destino = isStaticPreview()
+                ? 'carrinho.html'
                 : '/carrinho/';
 
             window.location.href = destino;
@@ -674,8 +689,8 @@ document.addEventListener('DOMContentLoaded', () => {
         homeLogoLink.addEventListener('click', (event) => {
             event.preventDefault();
 
-            if (window.location.port && window.location.port !== '8000') {
-                window.location.href = '/templates/index.html';
+            if (isStaticPreview()) {
+                window.location.href = 'index.html';
             } else {
                 window.location.href = '/';
             }
@@ -685,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const authStatus = document.getElementById('auth-status');
     if (!authStatus) return;
 
-    const liveServerMode = window.location.port && window.location.port !== '8000';
+    const liveServerMode = isStaticPreview();
     const cookies = document.cookie.split(';').reduce((acc, cookie) => {
         const [key, value] = cookie.trim().split('=');
         if (key) acc[key] = decodeURIComponent(value || '');
@@ -718,6 +733,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (liveServerMode) {
-        authStatus.innerHTML = 'Olá, <a href="/templates/Login.html" class="auth-link">Entre</a> ou <a href="/templates/cadastro.html" class="auth-link">Cadastre-se</a>';
+        authStatus.innerHTML = 'Ola, <a href="Login.html" class="auth-link">Entre</a> ou <a href="cadastro.html" class="auth-link">Cadastre-se</a>';
     }
 });

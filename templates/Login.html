@@ -20,6 +20,7 @@
                 <p id="login-error" class="form-error" hidden>Credenciais incorretas. Use o e-mail e a senha cadastrados.</p>
 
                 <form id="login-form" method="post" action="/login/">
+                    {% csrf_token %}
                     <div class="field-container">
                         <input type="email" name="email" placeholder="E-mail, CPF ou CNPJ" required>
                     </div>
@@ -34,7 +35,7 @@
                     </div>
 
                     <button type="submit" class="btn-login-verde">ENTRAR</button>
-                    <button type="button" class="btn-login-borda" id="go-cadastro">CRIAR CONTA</button>
+                    <a href="/cadastro/" class="btn-login-borda" id="go-cadastro">CRIAR CONTA</a>
                 </form>
             </section>
 
@@ -50,16 +51,16 @@
     </div>
     <script>
     const loginError = document.getElementById('login-error');
+    const isStaticPreview = window.location.protocol === 'file:' || window.location.pathname.toLowerCase().includes('/templates/');
 
     if (new URLSearchParams(window.location.search).get('erro') === 'credenciais') {
         loginError.hidden = false;
     }
 
-    document.getElementById('go-cadastro').addEventListener('click', function() {
-        if (window.location.port && window.location.port !== '8000') {
-            window.location.href = '/templates/cadastro.html';
-        } else {
-            window.location.href = '/cadastro/';
+    document.getElementById('go-cadastro').addEventListener('click', function(event) {
+        if (isStaticPreview) {
+            event.preventDefault();
+            window.location.href = 'cadastro.html';
         }
     });
 
@@ -74,7 +75,7 @@
             return;
         }
 
-        if (window.location.port && window.location.port !== '8000') {
+        if (isStaticPreview) {
             event.preventDefault();
             const emailCadastrado = localStorage.getItem('corebyte_email_cadastrado');
             const senhaCadastrada = localStorage.getItem('corebyte_senha_cadastrada');
@@ -88,7 +89,7 @@
 
             localStorage.setItem('corebyte_usuario_logado', email);
             localStorage.setItem('corebyte_usuario_nome', nomeCadastrado || email.split('@')[0]);
-            window.location.href = '/templates/index.html';
+            window.location.href = 'index.html';
         }
     });
     </script>

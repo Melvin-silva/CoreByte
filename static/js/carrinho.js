@@ -28,8 +28,10 @@ function salvarCarrinho(itens) {
 }
 
 function getHomeUrl() {
-    return window.location.port && window.location.port !== '8000'
-        ? '/templates/index.html'
+    const isStaticPreview = window.location.protocol === 'file:' || window.location.pathname.toLowerCase().includes('/templates/');
+
+    return isStaticPreview
+        ? 'index.html'
         : '/';
 }
 

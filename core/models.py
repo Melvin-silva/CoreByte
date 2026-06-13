@@ -15,7 +15,7 @@ class Categoria(models.Model):
 
 class Produto(models.Model):
     imagem = models.ImageField(upload_to="produtos/", blank=True, null=True)
-    nome = models.CharField(max_length=100, verbose_name="Nome")
+    nome = models.CharField(max_length=150, verbose_name="Nome")
     categoria = models.ForeignKey(
         Categoria,
         on_delete=models.PROTECT,
