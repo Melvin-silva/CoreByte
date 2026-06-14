@@ -127,6 +127,13 @@ document.addEventListener("DOMContentLoaded", function() {
     carregarCarrinhoSalvo();
     atualizarInterfaceCarrinho();
     atualizarContadorCarrinho();
+
+    document.querySelectorAll('.product-card[data-detail-url]').forEach(card => {
+        card.addEventListener('click', (event) => {
+            if (event.target.closest('button, a, input, label')) return;
+            window.location.href = card.dataset.detailUrl;
+        });
+    });
     
     // ConfiguraÃ§Ãµes do Carrinho
     const cartBtn = document.querySelector('.cart-link');

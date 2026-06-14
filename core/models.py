@@ -51,6 +51,8 @@ class Produto(models.Model):
 
 
 class Comentario(models.Model):
+    NOTAS_AVALIACAO = [(nota, str(nota)) for nota in range(1, 6)]
+
     produto = models.ForeignKey(
         Produto,
         on_delete=models.CASCADE,
@@ -64,6 +66,11 @@ class Comentario(models.Model):
         verbose_name="Usuario",
     )
     texto = models.TextField(verbose_name="Comentario")
+    avaliacao = models.PositiveSmallIntegerField(
+        choices=NOTAS_AVALIACAO,
+        default=5,
+        verbose_name="Avaliacao",
+    )
     criado_em = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
     aprovado = models.BooleanField(default=True, verbose_name="Aprovado")
 

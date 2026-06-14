@@ -10,15 +10,18 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('login/', views.login_view, name='login'),
     path('cadastro/', views.cadastro_view, name='cadastro'),
+    path('produto/<int:produto_id>/', views.produto_detalhe, name='produto_detalhe'),
     path('carrinho/', views.carrinho_view, name='carrinho'),
     path('checkout/', views.checkout_view, name='checkout'),
     path('logout/', views.logout_view, name='logout'),
+    path('erro-404/', views.preview_404_view, name='preview_404'),
     path('admin/', admin.site.urls),
 
     path('test-500/', views.test_500, name='test_500'),
     path('debug-500/', views.forcar_erro, name='debug_500'),
 
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATICFILES_DIRS[0]}),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
 handler404 = 'core.views.page_not_found_view'

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ produto.nome }} | CoreByte</title>
+    <link rel="stylesheet" href="/static/css/produto.css?v=20260613d">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="store-header">
+        <div class="header-main">
+            <a class="logo" href="/" aria-label="Ir para a tela inicial">
+                <img src="/static/img/Corebyte.png" alt="CoreByte">
+            </a>
+
+            <form class="search-bar" action="/" method="get">
+                <input type="search" name="q" placeholder="Encontre na CoreByte" aria-label="Buscar produto">
+                <button type="submit" aria-label="Buscar">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="M16.5 16.5 21 21"></path>
+                    </svg>
+                </button>
+            </form>
+
+            <div class="header-actions">
+                <span id="auth-status" class="product-auth-status">
+                    {% if request.user.is_authenticated %}
+                    <span class="logged-user">
+                        <span class="logged-greeting">Ola, <strong>{{ request.user.first_name|default:request.user.username }}</strong></span>
+                        <a href="/logout/" class="logout-link">Sair</a>
+                    </span>
+                    {% else %}
+                    <span class="login-pill">
+                        Ola,
+                        <a href="/login/">Entre</a>
+                        ou
+                        <a href="/cadastro/">Cadastre-se</a>
+                    </span>
+                    {% endif %}
+                </span>
+                <a href="#" class="cart-link" aria-label="Abrir carrinho">
+                    <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6.2 6h15.1l-1.8 8.6a2 2 0 0 1-2 1.6H8.8a2 2 0 0 1-2-1.6L5.2 3.8H2.5" />
+                        <circle cx="9.5" cy="20" r="1.4" />
+                        <circle cx="17.5" cy="20" r="1.4" />
+                    </svg>
+                    <span class="cart-label">Carrinho</span>
+                    <span id="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+
+        <nav class="header-nav" aria-label="Categorias principais">
+            <a href="/#grid-produtos">Promocoes</a>
+        </nav>
+    </header>
+
+    <main class="product-page">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <section class="product-shell">
+            <div class="gallery-column">
+                <div class="thumb-list" aria-label="Miniaturas do produto">
+                    <button class="thumb active" type="button" aria-label="Imagem principal">
+                        {% if imagem_url %}
+                        <img src="{{ imagem_url }}" alt="">
+                        {% else %}
+                        <img src="/static/img/Corebyte.png" alt="">
+                        {% endif %}
+                    </button>
+                    <button class="thumb" type="button" aria-label="Detalhe do produto">
+                        {% if imagem_url %}
+                        <img src="{{ imagem_url }}" alt="">
+                        {% else %}
+                        <img src="/static/img/Corebyte.png" alt="">
+                        {% endif %}
+                    </button>
+                    <button class="thumb" type="button" aria-label="Vista alternativa">
+                        {% if imagem_url %}
+                        <img src="{{ imagem_url }}" alt="">
+                        {% else %}
+                        <img src="/static/img/Corebyte.png" alt="">
+                        {% endif %}
+                    </button>
+                </div>
+
+                <div class="product-gallery">
+                    {% if badge %}
+                    <span class="detail-badge">{{ badge }}</span>
+                    {% endif %}
+                    {% if imagem_url %}
+                    <img src="{{ imagem_url }}" class="product-img" alt="{{ produto.nome }}">
+                    {% else %}
+                    <img src="/static/img/Corebyte.png" class="product-img" alt="{{ produto.nome }}">
+                    {% endif %}
+                </div>
+            </div>
+
+            <article class="buy-panel">
+                <div class="deal-banner">
+                    <strong>COREBYTE PRIME</strong>
+                    <span>setup gamer, hardware e performance</span>
+                </div>
+
+                <div class="deal-stats" aria-label="Resumo da oferta">
+                    <div>
+                        <strong>{% if badge %}{{ badge }}{% else %}15%{% endif %}</strong>
+                        <span>Desconto</span>
+                    </div>
+                    <div>
+                        <strong>{{ media_avaliacao|floatformat:1 }}</strong>
+                        <span>Nota media</span>
+                    </div>
+                    <div>
+                        <strong>{{ total_avaliacoes }}</strong>
+                        <span>Avaliacoes</span>
+                    </div>
+                </div>
+
+                <div class="product-meta">
+                    <span>NOVO</span>
+                    <span>12 meses de garantia</span>
+                </div>
+
+                <h1>{{ produto.nome }}</h1>
+                <p class="product-code">Categoria: {{ produto.categoria.nome }} | Tipo: {{ produto.tipo }}</p>
+
+                <div class="rank-row">
+                    <span class="hot-badge">MAIS VENDIDO</span>
+                    <span>Frete Gratis</span>
+                </div>
+
+                <p class="seller">Vendido por: <strong>CoreByte</strong></p>
+                <p class="delivery">Pronta entrega</p>
+                <p class="shipping">FRETE GRATIS: PE, CE, RN, PB, BA</p>
+
+                <div class="rating-row" aria-label="Avaliacao do produto">
+                    <span class="stars rating-stars" aria-hidden="true">
+                        <span class="{% if media_avaliacao_arredondada >= 1 %}active{% endif %}">&#9733;</span>
+                        <span class="{% if media_avaliacao_arredondada >= 2 %}active{% endif %}">&#9733;</span>
+                        <span class="{% if media_avaliacao_arredondada >= 3 %}active{% endif %}">&#9733;</span>
+                        <span class="{% if media_avaliacao_arredondada >= 4 %}active{% endif %}">&#9733;</span>
+                        <span class="{% if media_avaliacao_arredondada >= 5 %}active{% endif %}">&#9733;</span>
+                    </span>
+                    <span class="rating-text">
+                        {% if total_avaliacoes == 1 %}
+                        1 avaliacao
+                        {% elif total_avaliacoes %}
+                        {{ total_avaliacoes }} avaliacoes
+                        {% else %}
+                        0 avaliacoes
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="price-box">
+                    {% if valor_antigo %}
+                    <p class="old-price">De: <span>R$ {{ valor_antigo }}</span> por:</p>
+                    {% else %}
+                    <p class="old-price">Preco CoreByte:</p>
+                    {% endif %}
+                    <p class="current-price">R$ {{ preco }}</p>
+                    <p class="cash-note">a vista com desconto no boleto ou pix</p>
+                    <p class="card-price">ou 12x sem juros no cartao</p>
+                </div>
+
+                <button class="add-to-cart-btn"
+                        data-name="{{ produto.nome }}"
+                        data-price="{{ preco }}"
+                        data-image="{% if imagem_url %}{{ imagem_url }}{% else %}/static/img/Corebyte.png{% endif %}">
+                    Comprar com desconto
+                    <span aria-hidden="true">+</span>
+                </button>
+
+                <a class="back-link" href="/">Voltar para a loja</a>
+            </article>
+        </section>
+
+        <section class="description-section" aria-labelledby="description-title">
+            <h2 id="description-title">Descricao do produto</h2>
+            <div class="product-description-text">
+                {% for bloco in descricao_blocos %}
+                <div class="description-block">
+                    {% if bloco.titulo %}
+                    <h3>{{ bloco.titulo }}</h3>
+                    {% endif %}
+                    {% if bloco.texto %}
+                    <p>{{ bloco.texto|linebreaksbr }}</p>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p>Nenhuma descricao cadastrada para este produto.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="reviews-section" aria-labelledby="reviews-title">
+            <div class="section-heading">
+                <h2 id="reviews-title">Avaliacoes</h2>
+                <span class="stars rating-stars" aria-hidden="true">
+                    <span class="{% if media_avaliacao_arredondada >= 1 %}active{% endif %}">&#9733;</span>
+                    <span class="{% if media_avaliacao_arredondada >= 2 %}active{% endif %}">&#9733;</span>
+                    <span class="{% if media_avaliacao_arredondada >= 3 %}active{% endif %}">&#9733;</span>
+                    <span class="{% if media_avaliacao_arredondada >= 4 %}active{% endif %}">&#9733;</span>
+                    <span class="{% if media_avaliacao_arredondada >= 5 %}active{% endif %}">&#9733;</span>
+                </span>
+            </div>
+
+            <div class="review-form-card">
+                {% if request.user.is_authenticated %}
+                <form method="post" class="review-form">
+                    {% csrf_token %}
+                    <div>
+                        <label class="form-label">Sua nota</label>
+                        <div class="star-input" aria-label="Escolha de 1 a 5 estrelas">
+                            <input type="radio" id="star-5" name="avaliacao" value="5" checked>
+                            <label for="star-5" title="5 estrelas">&#9733;</label>
+                            <input type="radio" id="star-4" name="avaliacao" value="4">
+                            <label for="star-4" title="4 estrelas">&#9733;</label>
+                            <input type="radio" id="star-3" name="avaliacao" value="3">
+                            <label for="star-3" title="3 estrelas">&#9733;</label>
+                            <input type="radio" id="star-2" name="avaliacao" value="2">
+                            <label for="star-2" title="2 estrelas">&#9733;</label>
+                            <input type="radio" id="star-1" name="avaliacao" value="1">
+                            <label for="star-1" title="1 estrela">&#9733;</label>
+                        </div>
+                    </div>
+
+                    <label class="form-label" for="review-text">Escreva sua avaliacao</label>
+                    <textarea id="review-text" name="texto" rows="4" placeholder="Conte o que achou do produto..." required></textarea>
+
+                    <button class="review-submit" type="submit">Enviar avaliacao</button>
+                </form>
+                {% else %}
+                <div class="login-review-box">
+                    <strong>Quer avaliar este produto?</strong>
+                    <span>Entre na sua conta para escrever um comentario e escolher as estrelas.</span>
+                    <a href="/login/">Entrar para avaliar</a>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if comentarios %}
+            <div class="review-list">
+                {% for comentario in comentarios %}
+                <article class="review-card">
+                    <div class="review-head">
+                        <span class="review-author">{{ comentario.usuario.first_name|default:comentario.usuario.username }}</span>
+                        <span class="review-date">{{ comentario.criado_em|date:"d/m/Y" }}</span>
+                    </div>
+                    <span class="stars rating-stars" aria-hidden="true">
+                        <span class="{% if comentario.avaliacao >= 1 %}active{% endif %}">&#9733;</span>
+                        <span class="{% if comentario.avaliacao >= 2 %}active{% endif %}">&#9733;</span>
+                        <span class="{% if comentario.avaliacao >= 3 %}active{% endif %}">&#9733;</span>
+                        <span class="{% if comentario.avaliacao >= 4 %}active{% endif %}">&#9733;</span>
+                        <span class="{% if comentario.avaliacao >= 5 %}active{% endif %}">&#9733;</span>
+                    </span>
+                    <p>{{ comentario.texto }}</p>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-reviews">Este produto ainda nao possui comentarios cadastrados. A area de avaliacoes ja esta pronta para exibir opinioes dos clientes.</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <button id="close-cart" type="button">&times;</button>
+            <h3>MEU CARRINHO</h3>
+        </div>
+
+        <div id="cart-items-container"></div>
+
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="total-price">R$ 0,00</span>
+            </div>
+            <button class="checkout-btn" type="button">VER CARRINHO</button>
+        </div>
+    </div>
+
+    <script src="/static/js/body.js?v=20260613"></script>
+</body>
+</html>

@@ -18,7 +18,7 @@ class ProdutoAdmin(admin.ModelAdmin):
 
 @admin.register(Comentario)
 class ComentarioAdmin(admin.ModelAdmin):
-    list_display = ("produto", "usuario", "aprovado", "criado_em")
+    list_display = ("produto", "usuario", "avaliacao", "aprovado", "criado_em")
     search_fields = ("produto__nome", "usuario__username", "texto")
-    list_filter = ("aprovado", "criado_em")
+    list_filter = ("avaliacao", "aprovado", "criado_em")
     autocomplete_fields = ("produto", "usuario")
