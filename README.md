@@ -1,9 +1,11 @@
 # CoreByte
 
-CoreByte é uma loja virtual gamer desenvolvida com Django. O projeto apresenta um catálogo de produtos, páginas de detalhe, autenticação de usuários, avaliações, carrinho de compras e fluxo de checkout.
+CoreByte é uma loja virtual gamer desenvolvida com Django. O projeto apresenta um catálogo de produtos,
+ páginas de detalhe, autenticação de usuários, avaliações, carrinho de compras e fluxo de checkout.
 
 ## Integrantes
-Alunos: Adriano Augusto, Ayas Fernando, Diego Henrique, Jalison Moura, Melvin silva dos santos, Ruan Araujo 
+Alunos: Adriano Augusto, Ayas Fernando, Diego Henrique, Jalison Moura, Melvin silva dos santos,
+ Ruan Araujo 
 
 ## Funcionalidades
 
@@ -125,6 +127,17 @@ Painel administrativo:
 ```text
 http://127.0.0.1:8000/admin/
 ```
+
+## Usuario de teste
+Comum
+
+Gmail: teste@gmail.com
+Senha: 1234ruan
+
+Admin
+
+Nome: Ruan
+Senha: ruan1234
 
 ## Rotas principais
 
