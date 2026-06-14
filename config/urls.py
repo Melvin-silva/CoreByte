@@ -1,9 +1,11 @@
 from django.contrib import admin
-from django.urls import path, re_path 
 from django.conf import settings
-from django.views.static import serve
-from core import views
 from django.conf.urls.static import static
+from django.contrib.staticfiles.views import serve as staticfiles_serve
+from django.urls import path, re_path
+from django.views.static import serve as media_serve
+
+from core import views
 
 
 urlpatterns = [
@@ -20,8 +22,8 @@ urlpatterns = [
     path('test-500/', views.test_500, name='test_500'),
     path('debug-500/', views.forcar_erro, name='debug_500'),
 
-    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATICFILES_DIRS[0]}),
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    re_path(r'^static/(?P<path>.*)$', staticfiles_serve, {'insecure': True}),
+    re_path(r'^media/(?P<path>.*)$', media_serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
 handler404 = 'core.views.page_not_found_view'
