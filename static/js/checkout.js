@@ -1,3 +1,5 @@
+let cupomAplicado = null;
+
 function converterPrecoParaNumero(preco) {
     const precoNormalizado = String(preco)
         .replace('R$', '')
@@ -27,27 +29,95 @@ function salvarCarrinho(itens) {
     localStorage.setItem('corebyte_carrinho', JSON.stringify(itens));
 }
 
+function getCsrfToken() {
+    const input = document.querySelector('[name=csrfmiddlewaretoken]');
+    return input ? input.value : '';
+}
+
+function getCupomSalvo() {
+    return localStorage.getItem('corebyte_cupom_checkout') || '';
+}
+
+function salvarCupomAplicado(codigo) {
+    if (codigo) {
+        localStorage.setItem('corebyte_cupom_checkout', codigo);
+        return;
+    }
+
+    localStorage.removeItem('corebyte_cupom_checkout');
+}
+
+function calcularSubtotal(itens) {
+    return itens.reduce((soma, item) => soma + converterPrecoParaNumero(item.preco), 0);
+}
+
+function calcularDesconto(subtotal) {
+    if (!cupomAplicado) return 0;
+
+    if (Number(cupomAplicado.subtotal_base) === Number(subtotal)) {
+        return Math.min(subtotal, Number(cupomAplicado.valor_desconto) || 0);
+    }
+
+    const percentual = Number(cupomAplicado.desconto_percentual) || 0;
+    return Math.min(subtotal, subtotal * (percentual / 100));
+}
+
+function mostrarStatusCupom(mensagem, tipo) {
+    const status = document.getElementById('coupon-status');
+    if (!status) return;
+
+    status.textContent = mensagem || '';
+    status.classList.remove('success', 'error');
+
+    if (tipo) {
+        status.classList.add(tipo);
+    }
+}
+
 function renderizarResumoCheckout() {
     const itens = carregarCarrinho();
     const container = document.getElementById('checkout-items');
     const empty = document.getElementById('checkout-empty');
     const count = document.getElementById('checkout-count');
+    const subtotalElement = document.getElementById('checkout-subtotal');
     const total = document.getElementById('checkout-total');
+    const discountLine = document.getElementById('checkout-discount-line');
+    const discountElement = document.getElementById('checkout-discount');
+    const couponLabel = document.getElementById('checkout-coupon-label');
+    const removeCoupon = document.getElementById('remove-coupon');
 
     container.innerHTML = '';
 
     if (!itens.length) {
         empty.hidden = false;
         count.textContent = '0';
+        subtotalElement.textContent = formatarPrecoBR(0);
         total.textContent = formatarPrecoBR(0);
+        discountLine.hidden = true;
+        if (removeCoupon) removeCoupon.hidden = true;
         return;
     }
 
     empty.hidden = true;
 
-    const totalCarrinho = itens.reduce((soma, item) => soma + converterPrecoParaNumero(item.preco), 0);
+    const subtotal = calcularSubtotal(itens);
+    const desconto = calcularDesconto(subtotal);
+    const totalFinal = Math.max(subtotal - desconto, 0);
+
     count.textContent = String(itens.length);
-    total.textContent = formatarPrecoBR(totalCarrinho);
+    subtotalElement.textContent = formatarPrecoBR(subtotal);
+    total.textContent = formatarPrecoBR(totalFinal);
+
+    if (cupomAplicado && desconto > 0) {
+        discountLine.hidden = false;
+        discountElement.textContent = `-${formatarPrecoBR(desconto)}`;
+        couponLabel.textContent = `(${cupomAplicado.codigo})`;
+        if (removeCoupon) removeCoupon.hidden = false;
+    } else {
+        discountLine.hidden = true;
+        couponLabel.textContent = '';
+        if (removeCoupon) removeCoupon.hidden = true;
+    }
 
     itens.forEach((item) => {
         const row = document.createElement('article');
@@ -63,6 +133,71 @@ function renderizarResumoCheckout() {
     });
 }
 
+async function validarCupom(codigo, subtotal) {
+    const resposta = await fetch('/checkout/validar-cupom/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ codigo, subtotal })
+    });
+
+    let dados;
+
+    try {
+        dados = await resposta.json();
+    } catch {
+        throw new Error('Entre na sua conta novamente para aplicar o cupom.');
+    }
+
+    if (!resposta.ok || !dados.ok) {
+        throw new Error(dados.message || 'Cupom invalido.');
+    }
+
+    return dados;
+}
+
+async function aplicarCupom(codigo, mensagemCarregando = 'Validando cupom...') {
+    const itens = carregarCarrinho();
+    const subtotal = calcularSubtotal(itens);
+
+    if (!itens.length) {
+        mostrarStatusCupom('Adicione produtos ao carrinho antes de aplicar um cupom.', 'error');
+        return;
+    }
+
+    mostrarStatusCupom(mensagemCarregando);
+
+    try {
+        const dados = await validarCupom(codigo, subtotal);
+        cupomAplicado = {
+            codigo: dados.codigo,
+            desconto_percentual: dados.desconto_percentual,
+            valor_desconto: dados.valor_desconto,
+            total_com_desconto: dados.total_com_desconto,
+            subtotal_base: subtotal
+        };
+        salvarCupomAplicado(dados.codigo);
+        document.getElementById('coupon-code').value = dados.codigo;
+        mostrarStatusCupom(dados.message, 'success');
+        renderizarResumoCheckout();
+    } catch (erro) {
+        cupomAplicado = null;
+        salvarCupomAplicado('');
+        mostrarStatusCupom(erro.message, 'error');
+        renderizarResumoCheckout();
+    }
+}
+
+function removerCupom() {
+    cupomAplicado = null;
+    salvarCupomAplicado('');
+    document.getElementById('coupon-code').value = '';
+    mostrarStatusCupom('Cupom removido.');
+    renderizarResumoCheckout();
+}
+
 function preencherEnderecoPorCep(dadosCep) {
     document.getElementById('checkout-rua').value = dadosCep.rua || dadosCep.logradouro || '';
     document.getElementById('checkout-bairro').value = dadosCep.bairro || '';
@@ -75,46 +210,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const cepStatus = document.getElementById('cep-status');
     const buscarCepButton = document.getElementById('buscar-cep');
     const checkoutForm = document.getElementById('checkout-form');
+    const couponForm = document.getElementById('coupon-form');
+    const couponInput = document.getElementById('coupon-code');
+    const removeCoupon = document.getElementById('remove-coupon');
 
     renderizarResumoCheckout();
 
-   buscarCepButton.addEventListener('click', async () => {
-
-    const cep = cepInput.value.replace(/\D/g, '');
-
-    if (cep.length !== 8) {
-        cepStatus.textContent = 'Informe um CEP com 8 números.';
-        return;
+    const cupomSalvo = getCupomSalvo();
+    if (cupomSalvo) {
+        couponInput.value = cupomSalvo;
+        aplicarCupom(cupomSalvo, 'Revalidando cupom...');
     }
 
-    cepStatus.textContent = 'Buscando endereço...';
+    couponForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const codigo = couponInput.value.trim().toUpperCase();
 
-    try {
-
-        const resposta = await fetch(
-            `https://viacep.com.br/ws/${cep}/json/`
-        );
-
-        const dados = await resposta.json();
-
-        if (dados.erro) {
-            cepStatus.textContent = 'CEP não encontrado.';
+        if (!codigo) {
+            mostrarStatusCupom('Informe um codigo de cupom.', 'error');
             return;
         }
 
-        preencherEnderecoPorCep(dados);
+        aplicarCupom(codigo);
+    });
 
-        cepStatus.textContent =
-            'Endereço preenchido automaticamente.';
+    removeCoupon.addEventListener('click', removerCupom);
 
-    } catch (erro) {
+    buscarCepButton.addEventListener('click', async () => {
+        const cep = cepInput.value.replace(/\D/g, '');
 
-        console.error(erro);
+        if (cep.length !== 8) {
+            cepStatus.textContent = 'Informe um CEP com 8 numeros.';
+            return;
+        }
 
-        cepStatus.textContent =
-            'Erro ao consultar o CEP.';
-    }
-});
+        cepStatus.textContent = 'Buscando endereco...';
+
+        try {
+            const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const dados = await resposta.json();
+
+            if (dados.erro) {
+                cepStatus.textContent = 'CEP nao encontrado.';
+                return;
+            }
+
+            preencherEnderecoPorCep(dados);
+            cepStatus.textContent = 'Endereco preenchido automaticamente.';
+        } catch (erro) {
+            console.error(erro);
+            cepStatus.textContent = 'Erro ao consultar o CEP.';
+        }
+    });
 
     checkoutForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -126,6 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         alert('Pedido confirmado com sucesso!');
         salvarCarrinho([]);
+        salvarCupomAplicado('');
         window.location.href = '/';
     });
 });

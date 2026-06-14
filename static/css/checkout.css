@@ -251,6 +251,65 @@ input:focus {
     margin-bottom: 18px;
 }
 
+.coupon-form {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    margin-bottom: 18px;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    background: linear-gradient(145deg, rgba(112, 0, 255, 0.12), rgba(0, 229, 255, 0.05));
+}
+
+.coupon-form label {
+    color: #ffffff;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.coupon-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+}
+
+.coupon-row .secondary-action {
+    min-width: 104px;
+}
+
+.coupon-status {
+    min-height: 18px;
+    color: #b9b9c5;
+    font-size: 13px;
+}
+
+.coupon-status.success {
+    color: #00e5ff;
+}
+
+.coupon-status.error {
+    color: #ff6b8f;
+}
+
+.remove-coupon {
+    justify-self: start;
+    border: 0;
+    background: transparent;
+    color: #ff6b8f;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.discount-line {
+    color: #00e5ff;
+}
+
+.discount-line em {
+    color: #9befff;
+    font-style: normal;
+    font-size: 12px;
+}
+
 .summary-line {
     display: flex;
     justify-content: space-between;
@@ -283,7 +342,8 @@ input:focus {
     }
 
     .two-columns,
-    .cep-row {
+    .cep-row,
+    .coupon-row {
         grid-template-columns: 1fr;
     }
 

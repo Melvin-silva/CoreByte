@@ -136,8 +136,8 @@ Senha: 1234ruan
 
 Admin
 
-Nome: Ruan
-Senha: ruan1234
+Nome: ayas_admin@gmail.com
+Senha: A@123456
 
 ## Rotas principais
 

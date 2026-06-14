@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cupons | CoreByte</title>
+    <link rel="stylesheet" href="/static/css/cupom.css?v=20260614">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="coupon-header">
+        <div class="header-main">
+            <a class="logo" href="/" aria-label="Ir para a tela inicial">
+                <img src="/static/img/Corebyte.png" alt="CoreByte">
+            </a>
+
+            <div class="header-title">
+                <span>Area do gerente</span>
+                <strong>Gerenciamento de cupons</strong>
+            </div>
+
+            <nav class="header-actions" aria-label="Acoes de cupom">
+                <a class="nav-button" href="/">Loja</a>
+                {% if request.user.is_staff %}
+                <a class="nav-button primary" href="{% url 'cupom_criar' %}">Novo cupom</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="coupon-page">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <section class="coupon-hero">
+            <div>
+                <span class="eyebrow">CoreByte Admin</span>
+                <h1>Cupons promocionais</h1>
+                {% if request.user.is_staff %}
+                <p>Cadastre descontos, controle validade e ative campanhas sem alterar a vitrine principal.</p>
+                {% else %}
+                <p>Visualize os cupons promocionais disponiveis. As acoes de cadastro e edicao sao exclusivas para gerente.</p>
+                {% endif %}
+            </div>
+            <div class="hero-stats">
+                <article>
+                    <strong>{{ total_cupons }}</strong>
+                    <span>Total</span>
+                </article>
+                <article>
+                    <strong>{{ cupons_ativos }}</strong>
+                    <span>Ativos</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="coupon-grid" aria-label="Lista de cupons">
+            {% for cupom in cupons %}
+            <article class="coupon-card">
+                <div class="coupon-top">
+                    <h2>{{ cupom.codigo }}</h2>
+                    {% if cupom.ativo %}
+                    <span class="status active">Ativo</span>
+                    {% else %}
+                    <span class="status inactive">Inativo</span>
+                    {% endif %}
+                </div>
+
+                <p class="discount"><strong>{{ cupom.desconto_percentual|floatformat:2 }}%</strong> OFF</p>
+                <p class="meta">Validade: {{ cupom.validade|date:"d/m/Y"|default:"Sem validade" }}</p>
+                <p class="meta">Criado em: {{ cupom.criado_em|date:"d/m/Y" }}</p>
+
+                {% if request.user.is_staff %}
+                    <div class="coupon-actions">
+                        <a class="edit" href="{% url 'cupom_editar' cupom.id %}">Editar</a>
+                        <a class="delete" href="{% url 'cupom_excluir' cupom.id %}">Excluir</a>
+                    </div>
+                {% endif %}
+            </article>
+            {% empty %}
+            <article class="empty-state">
+                <h2>Nenhum cupom cadastrado</h2>
+                {% if request.user.is_staff %}
+                <p>Crie o primeiro cupom promocional da CoreByte para demonstrar o CRUD da aplicacao.</p>
+                <a href="{% url 'cupom_criar' %}">Cadastrar cupom</a>
+                {% else %}
+                <p>Ainda nao ha cupons promocionais disponiveis para visualizacao.</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </section>
+    </main>
+</body>
+</html>

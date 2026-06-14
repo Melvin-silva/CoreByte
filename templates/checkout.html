@@ -22,6 +22,7 @@
             </div>
 
             <form id="checkout-form" class="checkout-form">
+                {% csrf_token %}
                 <fieldset>
                     <legend>Dados do cliente</legend>
                     <div class="form-grid two-columns">
@@ -109,11 +110,28 @@
         <aside class="checkout-summary">
             <h2>Resumo do pedido</h2>
             <div id="checkout-items" class="checkout-items"></div>
+            <form id="coupon-form" class="coupon-form">
+                <label for="coupon-code">Cupom de desconto</label>
+                <div class="coupon-row">
+                    <input id="coupon-code" name="cupom" type="text" autocomplete="off" placeholder="Ex: GAMER10">
+                    <button id="apply-coupon" class="secondary-action" type="submit">APLICAR</button>
+                </div>
+                <p id="coupon-status" class="coupon-status" aria-live="polite"></p>
+                <button id="remove-coupon" class="remove-coupon" type="button" hidden>Remover cupom</button>
+            </form>
             <p id="checkout-empty" class="checkout-empty" hidden>Seu carrinho está vazio.</p>
 
             <div class="summary-line">
                 <span>Itens</span>
                 <strong id="checkout-count">0</strong>
+            </div>
+            <div class="summary-line">
+                <span>Subtotal</span>
+                <strong id="checkout-subtotal">R$ 0,00</strong>
+            </div>
+            <div id="checkout-discount-line" class="summary-line discount-line" hidden>
+                <span>Desconto <em id="checkout-coupon-label"></em></span>
+                <strong id="checkout-discount">-R$ 0,00</strong>
             </div>
             <div class="summary-line">
                 <span>Frete</span>
@@ -126,6 +144,6 @@
         </aside>
     </main>
 
-    <script src="/static/js/checkout.js"></script>
+    <script src="/static/js/checkout.js?v=20260614b"></script>
 </body>
 </html>

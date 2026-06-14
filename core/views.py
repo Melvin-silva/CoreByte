@@ -1,14 +1,23 @@
+import json
+from decimal import Decimal, InvalidOperation
+from functools import wraps
+from urllib.parse import quote
+
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.db.models import Avg
-from django.http import HttpResponse
+from django.db import DatabaseError
+from django.db.models import Avg, Q
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.text import slugify
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
 
-from .forms import CadastroForm, LoginForm
-from .models import Comentario, Produto
+from .forms import CadastroForm, CupomForm, LoginForm
+from .models import Comentario, Cupom, Produto
 
 
 def formatar_preco_br(valor):
@@ -55,6 +64,46 @@ def preparar_blocos_descricao(descricao):
         })
 
     return blocos
+
+
+def usuario_gerente(user):
+    return user.is_authenticated and user.is_staff
+
+
+def gerente_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "Entre com uma conta de gerente para acessar esta area.")
+            return redirect(f"/login/?next={quote(request.get_full_path())}")
+
+        if not request.user.is_staff:
+            messages.error(request, "Esta area e restrita para gerente ou administrador.")
+            return redirect("index")
+
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
+
+
+def autenticar_por_identificador(request, identificador, senha):
+    identificador = identificador.strip()
+
+    if not identificador or not senha:
+        return None
+
+    usuario = (
+        User.objects
+        .filter(Q(username__iexact=identificador) | Q(email__iexact=identificador))
+        .only("id", "username", "email", "password", "is_active", "first_name")
+        .first()
+    )
+
+    if usuario is None or not usuario.is_active or not usuario.check_password(senha):
+        return None
+
+    usuario.backend = "django.contrib.auth.backends.ModelBackend"
+    return usuario
 
 
 def index(request):
@@ -124,8 +173,9 @@ def produto_detalhe(request, produto_id):
             usuario=request.user,
             texto=texto,
             avaliacao=avaliacao,
+            aprovado=False,
         )
-        messages.success(request, "Avaliacao enviada com sucesso.")
+        messages.success(request, "Avaliacao enviada com sucesso. Ela sera exibida apos aprovacao.")
         return redirect("produto_detalhe", produto_id=produto.id)
 
     comentarios = Comentario.objects.select_related("usuario").filter(
@@ -158,41 +208,147 @@ def produto_detalhe(request, produto_id):
         "media_avaliacao_arredondada": media_avaliacao_arredondada,
     })
 
+
+@login_required(login_url='/login/')
+def cupom_lista(request):
+    cupons = Cupom.objects.all()
+    total_cupons = cupons.count()
+    cupons_ativos = cupons.filter(ativo=True).count()
+
+    return render(request, "cupom_lista.html", {
+        "cupons": cupons,
+        "total_cupons": total_cupons,
+        "cupons_ativos": cupons_ativos,
+    })
+
+
+@gerente_required
+def cupom_criar(request):
+    if request.method == "POST":
+        form = CupomForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cupom cadastrado com sucesso.")
+            return redirect("cupom_lista")
+    else:
+        form = CupomForm()
+
+    return render(request, "cupom_form.html", {
+        "form": form,
+        "titulo": "Cadastrar cupom",
+        "subtitulo": "Crie um novo desconto para campanhas da CoreByte.",
+        "botao": "Cadastrar cupom",
+    })
+
+
+@gerente_required
+def cupom_editar(request, cupom_id):
+    cupom = get_object_or_404(Cupom, id=cupom_id)
+
+    if request.method == "POST":
+        form = CupomForm(request.POST, instance=cupom)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cupom atualizado com sucesso.")
+            return redirect("cupom_lista")
+    else:
+        form = CupomForm(instance=cupom)
+
+    return render(request, "cupom_form.html", {
+        "form": form,
+        "cupom": cupom,
+        "titulo": "Editar cupom",
+        "subtitulo": "Atualize o codigo, desconto, validade ou status do cupom.",
+        "botao": "Salvar alteracoes",
+    })
+
+
+@gerente_required
+def cupom_excluir(request, cupom_id):
+    cupom = get_object_or_404(Cupom, id=cupom_id)
+
+    if request.method == "POST":
+        cupom.delete()
+        messages.success(request, "Cupom excluido com sucesso.")
+        return redirect("cupom_lista")
+
+    return render(request, "cupom_confirm_delete.html", {"cupom": cupom})
+
 def login_view(request):
+    next_url = request.POST.get("next") or request.GET.get("next") or ""
+    safe_next_url = ""
+
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        safe_next_url = next_url
+
+    if request.user.is_authenticated and request.method == "GET":
+        return redirect(safe_next_url or "index")
+
+    context = {"next": safe_next_url}
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
 
         if form.is_valid():
-            email = form.cleaned_data['email'].strip().lower()
+            email = form.cleaned_data['email'].strip()
             senha = form.cleaned_data['senha']
-            usuario = authenticate(request, username=email, password=senha)
+
+            try:
+                usuario = autenticar_por_identificador(request, email, senha)
+            except DatabaseError:
+                messages.error(request, 'Nao foi possivel conectar ao banco de dados. Confira a conexao com o Supabase.')
+                return render(request, 'Login.html', context)
 
             if usuario is not None:
                 login(request, usuario)
                 messages.success(request, 'Login realizado com sucesso.')
-                return redirect('index')
+                return redirect(safe_next_url or 'index')
 
             messages.error(request, 'E-mail ou senha invalidos.')
         else:
-            messages.error(request, 'Informe um e-mail e senha validos.')
+            messages.error(request, 'Informe e-mail e senha para entrar.')
 
-    return render(request, 'Login.html')
+    return render(request, 'Login.html', context)
 
 def cadastro_view(request):
     if request.method == 'POST':
+        senha_digitada = request.POST.get('senha')
+        confirmar_senha_digitada = request.POST.get('confirmar_senha')
+
+        if senha_digitada and confirmar_senha_digitada and senha_digitada != confirmar_senha_digitada:
+            messages.error(request, 'As senhas nao coincidem.')
+            return render(request, 'cadastro.html')
+
         form = CadastroForm(request.POST)
 
-        if form.is_valid():
+        try:
+            form_valido = form.is_valid()
+        except DatabaseError:
+            messages.error(request, 'Nao foi possivel validar o cadastro agora. Confira a conexao com o banco de dados.')
+            return render(request, 'cadastro.html')
+
+        if form_valido:
             nome = form.cleaned_data['nome'].strip()
             email = form.cleaned_data['email']
             senha = form.cleaned_data['senha']
 
-            User.objects.create_user(
-                username=email,
-                email=email,
-                password=senha,
-                first_name=nome,
-            )
+            try:
+                User.objects.create_user(
+                    username=email,
+                    email=email,
+                    password=senha,
+                    first_name=nome,
+                )
+            except DatabaseError:
+                messages.error(request, 'Nao foi possivel concluir o cadastro agora. Confira a conexao com o banco de dados.')
+                return render(request, 'cadastro.html')
+
             messages.success(request, 'Cadastro realizado com sucesso. Entre com sua conta.')
             return redirect('login')
 
@@ -209,6 +365,84 @@ def carrinho_view(request):
 @login_required(login_url='/login/')
 def checkout_view(request):
     return render(request, 'checkout.html')
+
+
+@login_required(login_url='/login/')
+@require_POST
+def validar_cupom_checkout(request):
+    try:
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except json.JSONDecodeError:
+        return JsonResponse({
+            "ok": False,
+            "message": "Nao foi possivel ler o cupom informado.",
+        }, status=400)
+
+    codigo = str(payload.get("codigo", "")).strip().upper()
+    subtotal = Decimal("0")
+
+    if not codigo:
+        return JsonResponse({
+            "ok": False,
+            "message": "Informe um codigo de cupom.",
+        }, status=400)
+
+    try:
+        subtotal = Decimal(str(payload.get("subtotal", "0"))).quantize(Decimal("0.01"))
+    except (InvalidOperation, TypeError, ValueError):
+        return JsonResponse({
+            "ok": False,
+            "message": "Subtotal invalido para aplicar o cupom.",
+        }, status=400)
+
+    if subtotal <= 0:
+        return JsonResponse({
+            "ok": False,
+            "message": "Adicione produtos ao carrinho antes de aplicar um cupom.",
+        }, status=400)
+
+    try:
+        cupom = Cupom.objects.only(
+            "codigo",
+            "desconto_percentual",
+            "ativo",
+            "validade",
+        ).get(codigo__iexact=codigo)
+    except Cupom.DoesNotExist:
+        return JsonResponse({
+            "ok": False,
+            "message": "Cupom nao encontrado.",
+        }, status=404)
+    except DatabaseError:
+        return JsonResponse({
+            "ok": False,
+            "message": "Nao foi possivel consultar o cupom agora.",
+        }, status=503)
+
+    if not cupom.ativo:
+        return JsonResponse({
+            "ok": False,
+            "message": "Este cupom esta inativo.",
+        }, status=400)
+
+    if cupom.validade and cupom.validade < timezone.localdate():
+        return JsonResponse({
+            "ok": False,
+            "message": "Este cupom esta vencido.",
+        }, status=400)
+
+    desconto_percentual = Decimal(cupom.desconto_percentual)
+    valor_desconto = (subtotal * desconto_percentual / Decimal("100")).quantize(Decimal("0.01"))
+    total_com_desconto = max(subtotal - valor_desconto, Decimal("0.00"))
+
+    return JsonResponse({
+        "ok": True,
+        "codigo": cupom.codigo,
+        "desconto_percentual": float(desconto_percentual),
+        "valor_desconto": float(valor_desconto),
+        "total_com_desconto": float(total_com_desconto),
+        "message": f"Cupom {cupom.codigo} aplicado com sucesso.",
+    })
 
 @login_required(login_url='/login/')
 def logout_view(request):

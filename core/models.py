@@ -50,6 +50,27 @@ class Produto(models.Model):
         return self.nome
 
 
+class Cupom(models.Model):
+    codigo = models.CharField(max_length=30, unique=True, verbose_name="Codigo")
+    desconto_percentual = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="Desconto percentual",
+    )
+    ativo = models.BooleanField(default=True, verbose_name="Ativo")
+    validade = models.DateField(blank=True, null=True, verbose_name="Validade")
+    criado_em = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
+    atualizado_em = models.DateTimeField(auto_now=True, verbose_name="Atualizado em")
+
+    class Meta:
+        verbose_name = "Cupom"
+        verbose_name_plural = "Cupons"
+        ordering = ["-criado_em"]
+
+    def __str__(self):
+        return self.codigo
+
+
 class Comentario(models.Model):
     NOTAS_AVALIACAO = [(nota, str(nota)) for nota in range(1, 6)]
 
@@ -72,7 +93,7 @@ class Comentario(models.Model):
         verbose_name="Avaliacao",
     )
     criado_em = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
-    aprovado = models.BooleanField(default=True, verbose_name="Aprovado")
+    aprovado = models.BooleanField(default=False, verbose_name="Aprovado")
 
     class Meta:
         verbose_name = "Comentario"

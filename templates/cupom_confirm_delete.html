@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excluir cupom | CoreByte</title>
+    <link rel="stylesheet" href="/static/css/cupom.css?v=20260614">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="coupon-header">
+        <div class="header-main">
+            <a class="logo" href="/" aria-label="Ir para a tela inicial">
+                <img src="/static/img/Corebyte.png" alt="CoreByte">
+            </a>
+
+            <div class="header-title">
+                <span>Area do gerente</span>
+                <strong>Excluir cupom</strong>
+            </div>
+
+            <nav class="header-actions" aria-label="Acoes de cupom">
+                <a class="nav-button" href="{% url 'cupom_lista' %}">Voltar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="coupon-page narrow">
+        <section class="delete-panel">
+            <span class="eyebrow danger">Acao permanente</span>
+            <h1>Excluir {{ cupom.codigo }}?</h1>
+            <p>Essa acao remove o cupom da area administrativa e nao pode ser desfeita.</p>
+
+            <form method="post" class="delete-actions">
+                {% csrf_token %}
+                <button type="submit">Confirmar exclusao</button>
+                <a href="{% url 'cupom_lista' %}">Cancelar</a>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

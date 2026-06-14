@@ -47,6 +47,12 @@ function formatarPrecoBR(valor) {
     });
 }
 
+function getUrlCarrinho() {
+    return isStaticPreview()
+        ? 'carrinho.html'
+        : '/carrinho/';
+}
+
 function atualizarInterfaceCarrinho() {
     const listaCarrinhoUI = document.getElementById('cart-items-container');
     if (!listaCarrinhoUI) return;
@@ -158,23 +164,37 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // BotÃµes "Adicionar ao Carrinho" - APENAS ESTE BLOCO
+    function adicionarProdutoDoBotao(botao) {
+        const nome = botao.getAttribute('data-name');
+        const preco = botao.getAttribute('data-price');
+        const imagemDoCard = botao.closest('.product-card')?.querySelector('.product-img')?.src;
+        const imagem = imagemDoCard || botao.getAttribute('data-image');
+
+        if (!nome || !preco) return false;
+
+        carrinhoItens.push({ nome, preco, imagem });
+        salvarCarrinho();
+        atualizarInterfaceCarrinho();
+        atualizarContadorCarrinho();
+        return true;
+    }
+
     document.querySelectorAll('.add-to-cart-btn').forEach(botao => {
         botao.addEventListener('click', function() {
-            const nome = this.getAttribute('data-name');
-            const preco = this.getAttribute('data-price');
-            const imagemDoCard = this.closest('.product-card')?.querySelector('.product-img')?.src;
-            const imagem = imagemDoCard || this.getAttribute('data-image');
-            
-            if (nome && preco) {
-                carrinhoItens.push({ nome, preco, imagem });
-                salvarCarrinho();
-                atualizarInterfaceCarrinho();
-                atualizarContadorCarrinho();
-                
-                if (sidebar) sidebar.classList.add('open');
-                document.body.classList.add('cart-open');
-            }
+            if (!adicionarProdutoDoBotao(this)) return;
+
+            if (sidebar) sidebar.classList.add('open');
+            document.body.classList.add('cart-open');
+        });
+    });
+
+    document.querySelectorAll('.buy-now-btn').forEach(botao => {
+        botao.addEventListener('click', function() {
+            if (!adicionarProdutoDoBotao(this)) return;
+
+            window.location.href = isStaticPreview()
+                ? 'checkout.html'
+                : '/checkout/';
         });
     });
 
@@ -216,6 +236,46 @@ function filtrarSecaoPrincipal(categoriaSelecionada) {
     });
 }
 
+function mostrarPromocoes() {
+    const gridProdutos = document.getElementById('grid-produtos');
+    if (!gridProdutos) return false;
+
+    filtrarSecaoPrincipal('promo');
+
+    document.querySelectorAll('.cat-card').forEach((card) => card.classList.remove('ativo'));
+
+    const filtroJogos = document.getElementById('filtro-jogos');
+    const filtroMarcas = document.querySelector('.filter-box');
+    if (filtroJogos) {
+        filtroJogos.classList.add('escondido');
+        filtroJogos.style.display = 'none';
+    }
+    if (filtroMarcas) {
+        filtroMarcas.style.display = 'block';
+    }
+
+    gridProdutos.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
+
+    return true;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.promocoes-link').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            if (!mostrarPromocoes()) return;
+            event.preventDefault();
+        });
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('promocoes') === '1') {
+        window.setTimeout(mostrarPromocoes, 0);
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const cardsMenu = document.querySelectorAll('.cat-card');
     const filtroJogos = document.getElementById('filtro-jogos');
@@ -249,6 +309,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.checkout-btn').forEach((botao) => {
+        botao.addEventListener('click', (event) => {
+            event.preventDefault();
+            window.location.href = getUrlCarrinho();
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
     const inputBusca = document.getElementById('barra-busca');
     const containerProdutos = document.getElementById('grid-produtos'); // Use o ID do seu grid
 
@@ -271,16 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const checkoutBtn = document.querySelector('.checkout-btn');
-    if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', () => {
-            const destino = isStaticPreview()
-                ? 'carrinho.html'
-                : '/carrinho/';
-
-            window.location.href = destino;
-        });
-    }
 });
 
 // ==========================================

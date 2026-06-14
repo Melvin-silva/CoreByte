@@ -53,7 +53,8 @@
         </div>
 
         <nav class="header-nav" aria-label="Categorias principais">
-            <a href="/#grid-produtos">Promocoes</a>
+            <a href="/?promocoes=1#grid-produtos" class="promocoes-link">Promocoes</a>
+            <a href="{% url 'cupom_lista' %}">Cupons</a>
         </nav>
     </header>
 
@@ -172,13 +173,24 @@
                     <p class="card-price">ou 12x sem juros no cartao</p>
                 </div>
 
-                <button class="add-to-cart-btn"
-                        data-name="{{ produto.nome }}"
-                        data-price="{{ preco }}"
-                        data-image="{% if imagem_url %}{{ imagem_url }}{% else %}/static/img/Corebyte.png{% endif %}">
-                    Comprar com desconto
-                    <span aria-hidden="true">+</span>
-                </button>
+                <div class="product-actions">
+                    <button class="buy-now-btn"
+                            type="button"
+                            data-name="{{ produto.nome }}"
+                            data-price="{{ preco }}"
+                            data-image="{% if imagem_url %}{{ imagem_url }}{% else %}/static/img/Corebyte.png{% endif %}">
+                        Finalizar compra
+                    </button>
+
+                    <button class="add-to-cart-btn"
+                            type="button"
+                            data-name="{{ produto.nome }}"
+                            data-price="{{ preco }}"
+                            data-image="{% if imagem_url %}{{ imagem_url }}{% else %}/static/img/Corebyte.png{% endif %}">
+                        Adicionar ao carrinho
+                        <span aria-hidden="true">+</span>
+                    </button>
+                </div>
 
                 <a class="back-link" href="/">Voltar para a loja</a>
             </article>
@@ -290,6 +302,6 @@
         </div>
     </div>
 
-    <script src="/static/js/body.js?v=20260613"></script>
+    <script src="/static/js/body.js?v=20260614c"></script>
 </body>
 </html>

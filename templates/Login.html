@@ -5,8 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoreByte - Acessar a Conta</title>
     <link rel="stylesheet" href="/static/css/Login.css">
+    <link rel="stylesheet" href="/static/css/toast.css?v=20260614">
 </head>
 <body>
+    <div class="toast-stack" aria-live="polite">
+        {% if messages %}
+            {% for message in messages %}
+            <p class="toast-message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        <p id="login-error" class="toast-message error" hidden>Credenciais incorretas. Use o e-mail e a senha cadastrados.</p>
+    </div>
+
     <div class="login-screen-central">
         <main class="container-box login-container">
             <section class="form-wrapper">
@@ -17,12 +27,11 @@
                 <h2>Acesse a sua Conta</h2>
                 <p class="desc-text">Insira os seus dados para entrar na plataforma.</p>
 
-                <p id="login-error" class="form-error" hidden>Credenciais incorretas. Use o e-mail e a senha cadastrados.</p>
-
-                <form id="login-form" method="post" action="/login/">
+                <form id="login-form" method="post" action="{% url 'login' %}">
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next|default:'' }}">
                     <div class="field-container">
-                        <input type="email" name="email" placeholder="E-mail, CPF ou CNPJ" required>
+                        <input type="text" name="email" placeholder="E-mail ou usuario" required>
                     </div>
 
                     <div class="field-container">
@@ -49,12 +58,21 @@
             </section>
         </main>
     </div>
+    <script src="/static/js/toast.js?v=20260614"></script>
     <script>
     const loginError = document.getElementById('login-error');
     const isStaticPreview = window.location.protocol === 'file:' || window.location.pathname.toLowerCase().includes('/templates/');
+    const showToast = window.showCoreByteToast || function(toast, message) {
+        if (!toast) return;
+        if (message) toast.textContent = message;
+        toast.hidden = false;
+        window.setTimeout(() => {
+            toast.hidden = true;
+        }, 5000);
+    };
 
     if (new URLSearchParams(window.location.search).get('erro') === 'credenciais') {
-        loginError.hidden = false;
+        showToast(loginError, 'Credenciais incorretas. Use o e-mail e a senha cadastrados.');
     }
 
     document.getElementById('go-cadastro').addEventListener('click', function(event) {
@@ -70,8 +88,7 @@
 
         if (!email || !senha) {
             event.preventDefault();
-            loginError.textContent = 'Informe e-mail e senha para entrar.';
-            loginError.hidden = false;
+            showToast(loginError, 'Informe e-mail e senha para entrar.');
             return;
         }
 
@@ -82,8 +99,7 @@
             const nomeCadastrado = localStorage.getItem('corebyte_nome_cadastrado');
 
             if (email !== emailCadastrado || senha !== senhaCadastrada) {
-                loginError.textContent = 'Credenciais incorretas. Use o e-mail e a senha cadastrados.';
-                loginError.hidden = false;
+                showToast(loginError, 'Credenciais incorretas. Use o e-mail e a senha cadastrados.');
                 return;
             }
 
