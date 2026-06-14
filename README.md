@@ -2,6 +2,9 @@
 
 CoreByte é uma loja virtual gamer desenvolvida com Django. O projeto apresenta um catálogo de produtos, páginas de detalhe, autenticação de usuários, avaliações, carrinho de compras e fluxo de checkout.
 
+## Integrantes
+Alunos: Adriano Augusto, Ayas Fernando, Diego Henrique, Jalison Moura, Melvin silva dos santos, Ruan Araujo 
+
 ## Funcionalidades
 
 - Catálogo de produtos com imagem, categoria, tipo, preço e destaque de promoção.
