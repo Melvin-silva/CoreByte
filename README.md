@@ -1,56 +1,54 @@
 # CoreByte
 
-CoreByte é uma loja virtual gamer desenvolvida com Django. O projeto apresenta um catálogo de produtos,
- páginas de detalhe, autenticação de usuários, avaliações, carrinho de compras e fluxo de checkout.
+CoreByte e uma loja virtual gamer desenvolvida com Django. O projeto apresenta catalogo de produtos, pagina de detalhes, autenticacao de usuarios, avaliacoes, carrinho de compras, checkout com ViaCEP e CRUD de cupons.
 
 ## Integrantes
-Alunos: Adriano Augusto, Ayas Fernando, Diego Henrique, Jalison Moura, Melvin silva dos santos,
- Ruan Araujo 
+
+Adriano Augusto, Ayas Fernando, Diego Henrique, Jalison Moura, Melvin Silva dos Santos e Ruan Araujo.
 
 ## Funcionalidades
 
-- Catálogo de produtos com imagem, categoria, tipo, preço e destaque de promoção.
-- Página de detalhes do produto com descrição formatada, preço antigo, desconto e avaliações.
-- Cadastro e login de usuários.
-- Área administrativa do Django para gerenciar categorias, produtos e comentários.
-- Carrinho de compras no navegador usando `localStorage`.
-- Checkout com resumo do pedido e busca de endereço por CEP via ViaCEP.
-- Páginas personalizadas para erro 404 e erro 500.
+- Catalogo de produtos com imagem, categoria, tipo, preco e destaque de promocao.
+- Pagina dedicada de produtos em `/produtos/`.
+- Pagina de detalhes do produto com descricao, preco antigo, desconto e avaliacoes.
+- Cadastro, login, logout e pagina de perfil do usuario.
+- Comentarios com nota de 1 a 5 estrelas publicados automaticamente.
+- Controle de acesso por perfil:
+  - usuario comum acessa loja, perfil, carrinho, checkout, comentarios e visualizacao de cupons;
+  - gerente/admin acessa cadastro, edicao e exclusao de cupons.
+- Carrinho de compras salvo no navegador com `localStorage`.
+- Checkout com resumo do pedido, busca de endereco por CEP via ViaCEP e aplicacao real de cupom.
+- CRUD de cupons com tela propria e area administrativa do Django.
+- Paginas personalizadas para erro 404 e erro 500.
+- Configuracao por variaveis de ambiente usando `.env`.
 
 ## Tecnologias
 
 - Python
 - Django 6
-- PostgreSQL
+- PostgreSQL / Supabase Database
 - HTML, CSS e JavaScript
 - Pillow para imagens
-- python-decouple para variáveis de ambiente
+- python-decouple para variaveis de ambiente
 
 ## Estrutura do projeto
 
 ```text
 CoreByte/
-├── config/              # Configurações principais do Django
+├── config/              # Configuracoes principais do Django
 ├── core/                # App principal com models, views, forms e admin
 ├── media/               # Imagens enviadas dos produtos
-├── static/              # Arquivos CSS, JS e imagens estáticas
-├── templates/           # Páginas HTML
-├── manage.py            # Utilitário de gerenciamento do Django
-├── requirements.txt     # Dependências do projeto
+├── static/              # Arquivos CSS, JS e imagens estaticas
+├── templates/           # Paginas HTML
+├── manage.py            # Utilitario de gerenciamento do Django
+├── requirements.txt     # Dependencias do projeto
+├── .env.example         # Exemplo de variaveis de ambiente
 └── README.md
 ```
 
-## Pré-requisitos
-
-Antes de começar, tenha instalado:
-
-- Python 3.12 ou superior
-- PostgreSQL
-- Git
-
 ## Como executar o projeto
 
-1. Clone o repositório:
+1. Clone o repositorio:
 
 ```bash
 git clone <url-do-repositorio>
@@ -75,13 +73,21 @@ No Linux/macOS:
 source .venv/bin/activate
 ```
 
-3. Instale as dependências:
+3. Instale as dependencias:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Crie um arquivo `.env` na raiz do projeto:
+4. Crie o arquivo `.env` a partir do exemplo:
+
+```bash
+copy .env.example .env
+```
+
+5. Configure o banco no `.env`.
+
+Exemplo local:
 
 ```env
 SECRET_KEY=sua-chave-secreta
@@ -96,15 +102,24 @@ DB_HOST=localhost
 DB_PORT=5432
 ```
 
-5. Crie o banco de dados no PostgreSQL com o nome configurado em `DB_NAME`.
+Exemplo usando Supabase:
 
-6. Execute as migrações:
+```env
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+DB_USER=seu_usuario_supabase
+DB_PASSWORD=sua_senha_supabase
+DB_HOST=seu_host_supabase
+DB_PORT=5432
+```
+
+6. Execute as migracoes:
 
 ```bash
 python manage.py migrate
 ```
 
-7. Crie um superusuário para acessar o painel administrativo:
+7. Crie um superusuario para acessar o admin:
 
 ```bash
 python manage.py createsuperuser
@@ -116,13 +131,11 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-9. Acesse no navegador:
+9. Acesse:
 
 ```text
 http://127.0.0.1:8000/
 ```
-
-Painel administrativo:
 
 ```text
 http://127.0.0.1:8000/admin/
@@ -141,16 +154,23 @@ Senha: A@123456
 
 ## Rotas principais
 
-| Rota | Descrição |
+| Rota | Descricao |
 | --- | --- |
-| `/` | Página inicial com catálogo de produtos |
-| `/login/` | Login de usuários |
-| `/cadastro/` | Cadastro de usuários |
+| `/` | Pagina inicial da loja |
+| `/produtos/` | Pagina com catalogo completo de produtos |
 | `/produto/<id>/` | Detalhes de um produto |
+| `/perfil/` | Perfil do usuario logado |
+| `/login/` | Login de usuarios |
+| `/cadastro/` | Cadastro de usuarios |
+| `/cupons/` | Listagem de cupons |
+| `/cupons/novo/` | Cadastro de cupom para gerente/admin |
+| `/cupons/<id>/editar/` | Edicao de cupom para gerente/admin |
+| `/cupons/<id>/excluir/` | Exclusao de cupom para gerente/admin |
 | `/carrinho/` | Carrinho de compras |
-| `/checkout/` | Finalização do pedido |
-| `/logout/` | Encerramento da sessão |
-| `/admin/` | Administração do Django |
+| `/checkout/` | Finalizacao do pedido |
+| `/checkout/validar-cupom/` | Validacao de cupom no checkout |
+| `/logout/` | Encerramento da sessao |
+| `/admin/` | Administracao do Django |
 
 ## Modelos principais
 
@@ -160,29 +180,36 @@ Representa as categorias dos produtos, como jogos, teclados, mouses, headsets e 
 
 ### Produto
 
-Armazena os dados dos itens vendidos na loja, incluindo imagem, nome, categoria, tipo, descrição, preço, promoção e preço antigo.
+Armazena os dados dos itens vendidos na loja, incluindo imagem, nome, categoria, tipo, descricao, preco, promocao e preco antigo.
 
-### Comentário
+### Comentario
 
-Representa as avaliações feitas por usuários autenticados em cada produto, com texto, nota de 1 a 5 e status de aprovação.
+Representa avaliacoes feitas por usuarios autenticados em cada produto, com texto e nota de 1 a 5.
 
-## Observações
+### Cupom
 
-- O carrinho é salvo no navegador do usuário com a chave `corebyte_carrinho`.
-- O checkout consulta CEPs usando a API pública do ViaCEP.
-- As imagens dos produtos ficam em `media/produtos/`.
-- O projeto usa sessões assinadas em cookies por meio de `django.contrib.sessions.backends.signed_cookies`.
-- O arquivo `.env` não deve ser enviado para o repositório, pois contém dados sensíveis.
+Armazena cupons promocionais com codigo, percentual de desconto, validade e status ativo/inativo.
 
-## Comandos úteis
+## Observacoes
+
+- O carrinho e salvo no navegador com a chave `corebyte_carrinho`.
+- O cupom aplicado no checkout e salvo temporariamente com a chave `corebyte_cupom_checkout`.
+- O checkout consulta CEPs usando a API publica do ViaCEP.
+- As imagens dos produtos ficam em `media/produtos/` no ambiente local.
+- Em deploy, as imagens devem ser enviadas manualmente para um storage publico, como Supabase Storage.
+- O projeto usa sessoes assinadas em cookies por meio de `django.contrib.sessions.backends.signed_cookies`.
+- O arquivo `.env` nao deve ser enviado para o repositorio, pois contem dados sensiveis.
+
+## Comandos uteis
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
+python manage.py collectstatic
 ```
 
 ## Status
 
-Projeto acadêmico/demonstrativo de e-commerce gamer com funcionalidades essenciais de catálogo, conta de usuário, avaliações, carrinho e checkout.
+Projeto academico/demonstrativo de e-commerce gamer com funcionalidades essenciais de catalogo, conta de usuario, avaliacoes, cupons, carrinho e checkout.

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from .models import Cupom
+from .models import Cupom, PerfilUsuario
 
 
 class CadastroForm(forms.Form):
@@ -36,6 +36,17 @@ class CadastroForm(forms.Form):
 class LoginForm(forms.Form):
     email = forms.CharField(max_length=254)
     senha = forms.CharField(widget=forms.PasswordInput)
+
+
+class PerfilUsuarioForm(forms.ModelForm):
+    class Meta:
+        model = PerfilUsuario
+        fields = ["imagem"]
+        widgets = {
+            "imagem": forms.FileInput(attrs={
+                "accept": "image/*",
+            }),
+        }
 
 
 class CupomForm(forms.ModelForm):

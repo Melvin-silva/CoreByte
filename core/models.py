@@ -50,6 +50,29 @@ class Produto(models.Model):
         return self.nome
 
 
+class PerfilUsuario(models.Model):
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="perfil",
+        verbose_name="Usuario",
+    )
+    imagem = models.ImageField(
+        upload_to="perfis/",
+        blank=True,
+        null=True,
+        verbose_name="Imagem de perfil",
+    )
+    atualizado_em = models.DateTimeField(auto_now=True, verbose_name="Atualizado em")
+
+    class Meta:
+        verbose_name = "Perfil de usuario"
+        verbose_name_plural = "Perfis de usuarios"
+
+    def __str__(self):
+        return f"Perfil de {self.usuario}"
+
+
 class Cupom(models.Model):
     codigo = models.CharField(max_length=30, unique=True, verbose_name="Codigo")
     desconto_percentual = models.DecimalField(
@@ -93,7 +116,7 @@ class Comentario(models.Model):
         verbose_name="Avaliacao",
     )
     criado_em = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
-    aprovado = models.BooleanField(default=False, verbose_name="Aprovado")
+    aprovado = models.BooleanField(default=True, verbose_name="Aprovado")
 
     class Meta:
         verbose_name = "Comentario"

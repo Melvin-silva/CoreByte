@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos | CoreByte</title>
+    <link rel="stylesheet" href="/static/css/index.css?v=20260615">
+    <link rel="stylesheet" href="/static/css/toast.css?v=20260614">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="store-header">
+    <div class="header-main">
+        <a class="logo" href="/" aria-label="Ir para a tela inicial">
+            <img src="/static/img/Corebyte.png" alt="CoreByte">
+        </a>
+
+        <form class="search-bar" action="{% url 'produtos' %}" method="get">
+            <input type="search" id="barra-busca" name="q" placeholder="Encontre na CoreByte" aria-label="Buscar produto">
+            <button type="submit" aria-label="Buscar">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <path d="M16.5 16.5 21 21"></path>
+                </svg>
+            </button>
+        </form>
+
+        <div class="header-actions">
+            <span id="auth-status" class="product-auth-status">
+                {% if request.user.is_authenticated %}
+                <span class="logged-user">
+                    <span class="logged-greeting">Ola, <strong>{{ request.user.first_name|default:request.user.username }}</strong></span>
+                    <a href="{% url 'perfil' %}" class="logout-link">Perfil</a>
+                    <a href="/logout/" class="logout-link">Sair</a>
+                </span>
+                {% else %}
+                <span class="login-pill">
+                    Ola,
+                    <a href="/login/">Entre</a>
+                    ou
+                    <a href="/cadastro/">Cadastre-se</a>
+                </span>
+                {% endif %}
+            </span>
+            <a href="#" class="cart-link" aria-label="Abrir carrinho">
+                <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6.2 6h15.1l-1.8 8.6a2 2 0 0 1-2 1.6H8.8a2 2 0 0 1-2-1.6L5.2 3.8H2.5"></path>
+                    <circle cx="9.5" cy="20" r="1.4"></circle>
+                    <circle cx="17.5" cy="20" r="1.4"></circle>
+                </svg>
+                <span class="cart-label">Carrinho</span>
+                <span id="cart-count">0</span>
+            </a>
+        </div>
+    </div>
+
+    <nav class="header-nav" aria-label="Categorias principais">
+        <a href="{% url 'index' %}">Inicio</a>
+        <a href="/?promocoes=1#grid-produtos" class="promocoes-link">Promocoes</a>
+        <a href="{% url 'cupom_lista' %}">Cupons</a>
+    </nav>
+</header>
+
+{% if messages %}
+<div class="toast-stack" aria-live="polite">
+    {% for message in messages %}
+    <p class="toast-message {{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>CATALOGO<br><span style="color:#00e5ff">COREBYTE</span></h1>
+        <p>Produtos gamer, jogos e perifericos reunidos em uma vitrine direta.</p>
+    </div>
+</section>
+
+<div class="categories">
+    <div class="cat-card" data-filter="todos" onclick="filtrarSecaoPrincipal('todos')">
+        <i class="fas fa-th-large"></i><p>Todos</p>
+    </div>
+    <div class="cat-card" data-filter="mouse" onclick="filtrarSecaoPrincipal('mouse')">
+        <i class="fas fa-mouse"></i><p>Mouses</p>
+    </div>
+    <div class="cat-card" data-filter="teclado" onclick="filtrarSecaoPrincipal('teclado')">
+        <i class="fas fa-keyboard"></i><p>Teclados</p>
+    </div>
+    <div class="cat-card" data-filter="headset" onclick="filtrarSecaoPrincipal('headset')">
+        <i class="fas fa-headset"></i><p>Headsets</p>
+    </div>
+    <div class="cat-card" data-filter="controle" onclick="filtrarSecaoPrincipal('controle')">
+        <i class="fas fa-gamepad"></i><p>Controles</p>
+    </div>
+    <div class="cat-card" id="btn-jogos" data-filter="jogo" onclick="filtrarSecaoPrincipal('jogo')">
+        <i class="fas fa-compact-disc"></i><p>Jogos</p>
+    </div>
+</div>
+
+<main class="main-content">
+    <aside>
+        <div class="filter-group">
+            <h4>DISPONIBILIDADE</h4>
+            <label><input type="checkbox" checked> Em Estoque</label>
+        </div>
+        <div class="filter-box">
+            <h3 class="filter-title"><span class="linha-roxa-marcas"></span>MARCAS</h3>
+            <div class="filter-options">
+                <label><input type="radio" name="marca-produto" value="razer" class="radio-marca"> Razer</label>
+                <label><input type="radio" name="marca-produto" value="logitech" class="radio-marca"> Logitech</label>
+                <label><input type="radio" name="marca-produto" value="hyperx" class="radio-marca"> HyperX</label>
+                <label><input type="radio" name="marca-produto" value="redragon" class="radio-marca"> Redragon</label>
+                <label><input type="radio" name="marca-produto" value="havit" class="radio-marca"> Havit</label>
+            </div>
+        </div>
+        <div class="filter-box escondido" id="filtro-jogos">
+            <h3 class="filter-title"><span class="linha-roxa-jogos"></span>CATEGORIAS</h3>
+            <div class="filter-options">
+                <label><input type="radio" name="categoria-jogo" value="rpg" class="radio-categoria"> RPG</label>
+                <label><input type="radio" name="categoria-jogo" value="acao" class="radio-categoria"> Acao / Aventura</label>
+                <label><input type="radio" name="categoria-jogo" value="luta" class="radio-categoria"> Luta</label>
+                <label><input type="radio" name="categoria-jogo" value="terror" class="radio-categoria"> Terror</label>
+            </div>
+        </div>
+    </aside>
+
+    <div class="products-grid" id="grid-produtos">
+        {% for produto in produtos %}
+        <div class="product-card {{ produto.classes }}" data-detail-url="/produto/{{ produto.id }}/"{% if produto.categoria_slug == 'jogo' %} data-categoria="{{ produto.tipo_slug }}"{% endif %}>
+            <a class="product-detail-link" href="/produto/{{ produto.id }}/" aria-label="Ver detalhes de {{ produto.nome }}">
+            {% if produto.imagem_url %}
+            <img src="{{ produto.imagem_url }}" class="product-img" alt="{{ produto.nome }}">
+            {% else %}
+            <img src="/static/img/Corebyte.png" class="product-img" alt="{{ produto.nome }}">
+            {% endif %}
+            </a>
+            <div class="product-info">
+                {% if produto.badge %}
+                <span class="badge">{{ produto.badge }}</span>
+                {% endif %}
+                <a class="product-title-link" href="/produto/{{ produto.id }}/">
+                    <h3>{{ produto.nome }}</h3>
+                </a>
+                {% if produto.valor_antigo %}
+                <p class="old-price">R$ {{ produto.valor_antigo }}</p>
+                {% endif %}
+                <p class="current-price">R$ {{ produto.preco }}</p>
+                <a class="product-view-link" href="/produto/{{ produto.id }}/">VER DETALHES</a>
+                <button class="add-to-cart-btn"
+                        data-name="{{ produto.nome }}"
+                        data-price="{{ produto.preco }}"
+                        data-image="{% if produto.imagem_url %}{{ produto.imagem_url }}{% else %}/static/img/Corebyte.png{% endif %}">
+                    ADICIONAR
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <p class="empty-products">Nenhum produto cadastrado ainda.</p>
+        {% endfor %}
+    </div>
+</main>
+
+<footer style="background: #000; padding: 40px 5%; text-align: center; border-top: 1px solid #222; margin-top: 50px;">
+    <p style="color: #666; font-size: 0.8rem;">&copy; 2026 COREBYTE - TODOS OS DIREITOS RESERVADOS</p>
+</footer>
+
+<div id="cart-sidebar" class="cart-sidebar">
+    <div class="cart-header">
+        <button id="close-cart">&times;</button>
+        <h3>MEU CARRINHO</h3>
+    </div>
+
+    <div id="cart-items-container"></div>
+
+    <div class="cart-footer">
+        <div class="cart-total">
+            <span>Total:</span>
+            <span id="total-price">R$ 0,00</span>
+        </div>
+        <button class="checkout-btn">VER CARRINHO</button>
+    </div>
+</div>
+
+<button id="chatbot-help-button" class="chatbot-help-button" type="button" aria-label="Abrir ajuda">?</button>
+
+<section id="chatbot-panel" class="chatbot-panel" aria-label="Chatbot de ajuda" aria-hidden="true">
+    <div class="chatbot-header">
+        <div>
+            <strong>Assistente CoreByte</strong>
+            <span>IA simbolica</span>
+        </div>
+        <button id="chatbot-close" type="button" aria-label="Fechar ajuda">&times;</button>
+    </div>
+
+    <div id="chatbot-messages" class="chatbot-messages"></div>
+    <div id="chatbot-options" class="chatbot-options"></div>
+</section>
+
+<script src="/static/js/toast.js?v=20260614"></script>
+<script src="/static/js/body.js?v=20260614c"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    window.filtrar = function(categoria) {
+        document.querySelectorAll('.product-card').forEach((produto) => {
+            const deveMostrar = categoria === 'todos' || produto.classList.contains(categoria);
+            produto.classList.toggle('esconder-animado', !deveMostrar);
+            produto.style.display = deveMostrar ? 'block' : 'none';
+        });
+    };
+
+    window.filtrarSecaoPrincipal = function(categoria) {
+        window.filtrar(categoria);
+    };
+
+    document.addEventListener('click', (event) => {
+        const card = event.target.closest('.cat-card');
+        if (!card) return;
+
+        document.querySelectorAll('.cat-card').forEach((item) => item.classList.remove('ativo'));
+        card.classList.add('ativo');
+    });
+});
+</script>
+</body>
+</html>

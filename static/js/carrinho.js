@@ -94,13 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarCarrinho();
     });
 
-    document.getElementById('finish-order').addEventListener('click', () => {
+    document.getElementById('finish-order').addEventListener('click', (event) => {
         if (!carregarCarrinho().length) {
             alert('Seu carrinho esta vazio.');
             return;
         }
 
-        window.location.href = '/checkout/';
+        window.location.href = event.currentTarget.dataset.checkoutUrl || '/checkout/';
     });
 
     renderizarCarrinho();

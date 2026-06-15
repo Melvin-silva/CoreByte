@@ -193,6 +193,12 @@ input:focus {
     filter: brightness(1.12);
 }
 
+.primary-action:disabled {
+    cursor: default;
+    opacity: 0.75;
+    filter: none;
+}
+
 .checkout-summary {
     padding: 24px;
     position: sticky;
@@ -323,6 +329,88 @@ input:focus {
     color: #ffffff;
     font-size: 20px;
     border-bottom: 0;
+}
+
+.checkout-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.74);
+    backdrop-filter: blur(8px);
+}
+
+.checkout-popup[hidden] {
+    display: none;
+}
+
+.checkout-popup-card {
+    width: min(420px, 100%);
+    padding: 30px;
+    border: 1px solid rgba(0, 229, 255, 0.38);
+    border-radius: 12px;
+    background:
+        linear-gradient(145deg, rgba(112, 0, 255, 0.22), rgba(0, 229, 255, 0.08)),
+        #12121a;
+    text-align: center;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 28px rgba(0, 229, 255, 0.12);
+    animation: popupIn 0.28s ease;
+}
+
+.checkout-popup-icon {
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #00e5ff;
+    color: #050505;
+    font-weight: 900;
+    box-shadow: 0 0 24px rgba(0, 229, 255, 0.34);
+}
+
+.checkout-popup-card h2 {
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.checkout-popup-card p {
+    color: #c9c9d3;
+    line-height: 1.5;
+}
+
+.checkout-popup-action {
+    min-height: 44px;
+    margin-top: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 18px;
+    border-radius: 8px;
+    background: #7000ff;
+    color: #ffffff;
+    font-weight: 900;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.checkout-popup-action:hover {
+    filter: brightness(1.12);
+}
+
+@keyframes popupIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 @media (max-width: 900px) {

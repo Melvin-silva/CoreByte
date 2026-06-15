@@ -10,6 +10,8 @@ from core import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('produtos/', views.produtos_view, name='produtos'),
+    path('perfil/', views.perfil_view, name='perfil'),
     path('login/', views.login_view, name='login'),
     path('cadastro/', views.cadastro_view, name='cadastro'),
     path('produto/<int:produto_id>/', views.produto_detalhe, name='produto_detalhe'),

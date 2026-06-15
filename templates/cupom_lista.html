@@ -21,6 +21,7 @@
 
             <nav class="header-actions" aria-label="Acoes de cupom">
                 <a class="nav-button" href="/">Loja</a>
+                <a class="nav-button" href="{% url 'perfil' %}">Perfil</a>
                 {% if request.user.is_staff %}
                 <a class="nav-button primary" href="{% url 'cupom_criar' %}">Novo cupom</a>
                 {% endif %}

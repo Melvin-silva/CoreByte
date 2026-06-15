@@ -16,8 +16,8 @@ from django.utils.text import slugify
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
-from .forms import CadastroForm, CupomForm, LoginForm
-from .models import Comentario, Cupom, Produto
+from .forms import CadastroForm, CupomForm, LoginForm, PerfilUsuarioForm
+from .models import Comentario, Cupom, PerfilUsuario, Produto
 
 
 def formatar_preco_br(valor):
@@ -106,10 +106,18 @@ def autenticar_por_identificador(request, identificador, senha):
     return usuario
 
 
-def index(request):
+def montar_produtos_catalogo(busca=""):
     produtos = []
+    queryset = Produto.objects.select_related("categoria").all()
 
-    for produto in Produto.objects.select_related("categoria").all():
+    if busca:
+        queryset = queryset.filter(
+            Q(nome__icontains=busca)
+            | Q(tipo__icontains=busca)
+            | Q(categoria__nome__icontains=busca)
+        )
+
+    for produto in queryset:
         categoria_slug = normalizar_slug(produto.categoria.nome)
         tipo_slug = normalizar_slug(produto.tipo)
         classes = " ".join(filter(None, [
@@ -139,7 +147,67 @@ def index(request):
             "classes": classes,
         })
 
-    return render(request, 'index.html', {"produtos": produtos})
+    return produtos
+
+
+def obter_foto_perfil_url(user):
+    if not user.is_authenticated:
+        return ""
+
+    try:
+        perfil = user.perfil
+    except PerfilUsuario.DoesNotExist:
+        return ""
+
+    if perfil.imagem and perfil.imagem.storage.exists(perfil.imagem.name):
+        return perfil.imagem.url
+
+    return ""
+
+
+def index(request):
+    produtos = montar_produtos_catalogo(request.GET.get("q", "").strip())
+
+    return render(request, 'index.html', {
+        "produtos": produtos,
+        "foto_perfil_url": obter_foto_perfil_url(request.user),
+    })
+
+
+def produtos_view(request):
+    produtos = montar_produtos_catalogo(request.GET.get("q", "").strip())
+
+    return render(request, "produtos.html", {"produtos": produtos})
+
+
+@login_required(login_url='/login/')
+def perfil_view(request):
+    perfil, _ = PerfilUsuario.objects.get_or_create(usuario=request.user)
+    total_comentarios = Comentario.objects.filter(usuario=request.user).count()
+    nome_perfil = (
+        request.user.get_full_name()
+        or request.user.first_name
+        or request.user.username
+        or request.user.email
+    )
+    form = PerfilUsuarioForm(instance=perfil)
+
+    if request.method == "POST":
+        form = PerfilUsuarioForm(request.POST, request.FILES, instance=perfil)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Imagem de perfil atualizada com sucesso.")
+            return redirect("perfil")
+
+        messages.error(request, "Nao foi possivel atualizar a imagem de perfil.")
+
+    return render(request, "perfil.html", {
+        "nome_perfil": nome_perfil,
+        "perfil_form": form,
+        "foto_perfil_url": obter_foto_perfil_url(request.user),
+        "total_comentarios": total_comentarios,
+    })
 
 def produto_detalhe(request, produto_id):
     produto = get_object_or_404(
@@ -173,9 +241,9 @@ def produto_detalhe(request, produto_id):
             usuario=request.user,
             texto=texto,
             avaliacao=avaliacao,
-            aprovado=False,
+            aprovado=True,
         )
-        messages.success(request, "Avaliacao enviada com sucesso. Ela sera exibida apos aprovacao.")
+        messages.success(request, "Avaliacao publicada com sucesso.")
         return redirect("produto_detalhe", produto_id=produto.id)
 
     comentarios = Comentario.objects.select_related("usuario").filter(

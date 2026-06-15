@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoreByte | Hardware & Games</title>
     <!-- Fontes e Ãcones -->
-    <link rel="stylesheet" href="/static/css/index.css?v=20260613">
+    <link rel="stylesheet" href="/static/css/index.css?v=20260615b">
     <link rel="stylesheet" href="/static/css/toast.css?v=20260614">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Orbitron:wght@700&display=swap" rel="stylesheet">
     
@@ -176,7 +176,15 @@
             <span id="auth-status" class="product-auth-status">
                 {% if request.user.is_authenticated %}
                 <span class="logged-user">
+                    <a href="{% url 'perfil' %}" class="user-avatar-mini" aria-label="Ver perfil">
+                        {% if foto_perfil_url %}
+                        <img src="{{ foto_perfil_url }}" alt="Foto de perfil">
+                        {% else %}
+                        <span>{{ request.user.first_name|default:request.user.username|first|upper }}</span>
+                        {% endif %}
+                    </a>
                     <span class="logged-greeting">Ola, <strong>{{ request.user.first_name|default:request.user.username }}</strong></span>
+                    <a href="{% url 'perfil' %}" class="logout-link">Perfil</a>
                     <a href="/logout/" class="logout-link">Sair</a>
                 </span>
                 {% else %}

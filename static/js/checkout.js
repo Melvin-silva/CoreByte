@@ -29,6 +29,33 @@ function salvarCarrinho(itens) {
     localStorage.setItem('corebyte_carrinho', JSON.stringify(itens));
 }
 
+function carregarCompras() {
+    try {
+        return JSON.parse(localStorage.getItem('corebyte_compras')) || [];
+    } catch {
+        return [];
+    }
+}
+
+function salvarCompraFinalizada(itens) {
+    const subtotal = calcularSubtotal(itens);
+    const desconto = calcularDesconto(subtotal);
+    const total = Math.max(subtotal - desconto, 0);
+    const compras = carregarCompras();
+
+    compras.unshift({
+        id: Date.now(),
+        data: new Date().toISOString(),
+        itens,
+        subtotal,
+        desconto,
+        total,
+        cupom: cupomAplicado ? cupomAplicado.codigo : ''
+    });
+
+    localStorage.setItem('corebyte_compras', JSON.stringify(compras.slice(0, 20)));
+}
+
 function getCsrfToken() {
     const input = document.querySelector('[name=csrfmiddlewaretoken]');
     return input ? input.value : '';
@@ -205,6 +232,14 @@ function preencherEnderecoPorCep(dadosCep) {
     document.getElementById('checkout-uf').value = dadosCep.uf || '';
 }
 
+function mostrarPopupPedidoConfirmado() {
+    const popup = document.getElementById('checkout-success-popup');
+
+    if (popup) {
+        popup.hidden = false;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const cepInput = document.getElementById('checkout-cep');
     const cepStatus = document.getElementById('cep-status');
@@ -213,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const couponForm = document.getElementById('coupon-form');
     const couponInput = document.getElementById('coupon-code');
     const removeCoupon = document.getElementById('remove-coupon');
+    const confirmOrder = document.getElementById('confirm-order');
 
     renderizarResumoCheckout();
 
@@ -265,15 +301,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     checkoutForm.addEventListener('submit', (event) => {
         event.preventDefault();
+        const itens = carregarCarrinho();
 
-        if (!carregarCarrinho().length) {
+        if (!itens.length) {
             alert('Seu carrinho esta vazio.');
             return;
         }
 
-        alert('Pedido confirmado com sucesso!');
+        if (confirmOrder) {
+            confirmOrder.disabled = true;
+            confirmOrder.textContent = 'PEDIDO CONFIRMADO';
+        }
+
+        salvarCompraFinalizada(itens);
         salvarCarrinho([]);
         salvarCupomAplicado('');
-        window.location.href = '/';
+        renderizarResumoCheckout();
+        mostrarPopupPedidoConfirmado();
+
+        setTimeout(() => {
+            window.location.href = '/perfil/';
+        }, 2500);
     });
 });

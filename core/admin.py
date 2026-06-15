@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Categoria, Comentario, Cupom, Produto
+from .models import Categoria, Comentario, Cupom, PerfilUsuario, Produto
 
 
 @admin.register(Categoria)
@@ -35,9 +35,18 @@ class CupomAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(PerfilUsuario)
+class PerfilUsuarioAdmin(admin.ModelAdmin):
+    list_display = ("usuario", "imagem", "atualizado_em")
+    search_fields = ("usuario__username", "usuario__email", "usuario__first_name")
+    autocomplete_fields = ("usuario",)
+    readonly_fields = ("atualizado_em",)
+
+
 @admin.register(Comentario)
 class ComentarioAdmin(admin.ModelAdmin):
-    list_display = ("produto", "usuario", "avaliacao", "aprovado", "criado_em")
+    list_display = ("produto", "usuario", "avaliacao", "criado_em")
     search_fields = ("produto__nome", "usuario__username", "texto")
-    list_filter = ("avaliacao", "aprovado", "criado_em")
+    list_filter = ("avaliacao", "criado_em")
     autocomplete_fields = ("produto", "usuario")
+    exclude = ("aprovado",)
